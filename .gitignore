@@ -1,0 +1,7 @@
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+go.work
+bin/

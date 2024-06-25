@@ -1,0 +1,30 @@
+package view
+
+templ Index(name string) {
+	@Base() {
+		<div>Hello, { name }</div>
+	}
+}
+
+templ Alert(content string) {
+	<div class="alert alert-warning m-md-5 border border-4 border-warning">{ content }</div>
+}
+
+templ Page() {
+	// index
+    <div class="m-md-5 row">
+        <div class="mb-md-5 mb-3 col-sm-8" id="article">
+            <h1>Page name</h1>
+            <span>Page content</span>
+        </div>
+    
+        <div class="col-sm-4 mb-4 mb-md-0 mx-auto">
+            <a class="btn btn-outline-dark mb-2 w-100" data-bs-toggle="collapse" data-bs-target="#pages" aria-expanded="true" aria-controls="pages">Pages</a>
+            <div id="pages" class="collapse show">
+                <ul class="list-group card border-dark p-2 text-dark">
+                    <li class="list-group-item border-0"><a href="/">Page 1</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+}

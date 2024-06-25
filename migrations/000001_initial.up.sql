@@ -1,0 +1,29 @@
+CREATE TABLE IF NOT EXISTS categories (
+    id VARCHAR(36) PRIMARY KEY,
+    name VARCHAR(40) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS articles (
+    id VARCHAR(36) PRIMARY KEY,
+    category_id VARCHAR(36),
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS commits (
+    id VARCHAR(36) PRIMARY KEY,
+    title VARCHAR(128) NOT NULL,
+    body TEXT NOT NULL,
+    article_id VARCHAR(36) NOT NULL,
+    author_id VARCHAR(36) NOT NULL,
+    created TIMESTAMP NOT NULL,
+    FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE NO ACTION 
+);
+
+CREATE TABLE IF NOT EXISTS accounts (
+    id VARCHAR(36) PRIMARY KEY,
+    username VARCHAR(36) NOT NULL,
+    password VARCHAR(64) NOT NULL,
+    salt VARCHAR(36) NOT NULL,
+    created TIMESTAMP NOT NULL,
+    role VARCHAR(10) NOT NULL
+);

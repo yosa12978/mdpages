@@ -3,7 +3,9 @@ package repos
 import (
 	"context"
 	"database/sql"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/yosa12978/mdpages/types"
 )
 
@@ -22,11 +24,38 @@ func NewArticleRepo(db *sql.DB) ArticleRepo {
 }
 
 func (a *articleRepo) Create(ctx context.Context, entity types.Article) error {
-	panic("unimplemented")
+	q := `
+		INSERT INTO articles (id, category_id) VALUES ($1, $2);
+		INSERT INTO commits (
+			id, 
+			title, 
+			body, 
+			article_id, 
+			author_id, 
+			created
+		) VALUES ($3, $4, $5, $6, $7);
+	`
+	article_id := uuid.NewString()
+	commit_id := uuid.NewString()
+	_, err := a.db.ExecContext(ctx, q,
+		article_id,
+		entity.CategoryId,
+		commit_id,
+		entity.Title,
+		entity.Body,
+		article_id,
+		"author_id",
+		time.Now().Unix(),
+	)
+	return err
 }
 
 func (a *articleRepo) Delete(ctx context.Context, id string) error {
-	panic("unimplemented")
+	q := `
+		DELETE FROM articles WHERE id=$1;
+	`
+	_, err := a.db.ExecContext(ctx, q, id)
+	return err
 }
 
 func (a *articleRepo) GetAll(ctx context.Context) ([]types.Article, error) {

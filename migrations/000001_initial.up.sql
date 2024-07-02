@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS commits (
     article_id VARCHAR(36) NOT NULL,
     author_id VARCHAR(36) NOT NULL,
     created TIMESTAMP NOT NULL,
-    FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE NO ACTION 
+    FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE 
 );
 
 CREATE TABLE IF NOT EXISTS accounts (

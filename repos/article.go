@@ -3,14 +3,16 @@ package repos
 import (
 	"context"
 	"database/sql"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/yosa12978/mdpages/types"
 )
 
 type ArticleRepo interface {
-	CRUD[types.Article]
+	GetById(ctx context.Context, id string) (*types.Article, error)
+	GetAll(ctx context.Context) ([]types.Article, error)
+	Create(ctx context.Context, entity types.Article) error
+	Update(ctx context.Context, id string, entity types.Article) error
+	Delete(ctx context.Context, id string) error
 }
 
 type articleRepo struct {
@@ -33,19 +35,17 @@ func (a *articleRepo) Create(ctx context.Context, entity types.Article) error {
 			article_id, 
 			author_id, 
 			created
-		) VALUES ($3, $4, $5, $6, $7);
+		) VALUES ($3, $4, $5, $6, $7, $8);
 	`
-	article_id := uuid.NewString()
-	commit_id := uuid.NewString()
 	_, err := a.db.ExecContext(ctx, q,
-		article_id,
+		entity.Id,
 		entity.CategoryId,
-		commit_id,
+		entity.CommitId,
 		entity.Title,
 		entity.Body,
-		article_id,
-		"author_id",
-		time.Now().Unix(),
+		entity.Id,
+		entity.CommitAuthor,
+		entity.CommitCreated,
 	)
 	return err
 }

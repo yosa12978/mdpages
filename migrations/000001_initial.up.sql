@@ -14,14 +14,13 @@ CREATE TABLE IF NOT EXISTS commits (
     title VARCHAR(128) NOT NULL,
     body TEXT NOT NULL,
     article_id VARCHAR(36) NOT NULL,
-    author_id VARCHAR(36) NOT NULL,
+    author VARCHAR(36) NOT NULL,
     created TIMESTAMP NOT NULL,
     FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE 
 );
 
 CREATE TABLE IF NOT EXISTS accounts (
-    id VARCHAR(36) PRIMARY KEY,
-    username VARCHAR(36) NOT NULL,
+    username VARCHAR(36) PRIMARY KEY NOT NULL,
     password VARCHAR(64) NOT NULL,
     salt VARCHAR(36) NOT NULL,
     created TIMESTAMP NOT NULL,

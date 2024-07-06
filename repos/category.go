@@ -3,13 +3,16 @@ package repos
 import (
 	"context"
 	"database/sql"
-	"errors"
 
 	"github.com/yosa12978/mdpages/types"
 )
 
 type CategoryRepo interface {
-	CRUD[types.Category]
+	GetAll(ctx context.Context) ([]types.Category, error)
+	Create(ctx context.Context, entity types.Category) error
+	Delete(ctx context.Context, id string) error
+	GetById(ctx context.Context, id string) (*types.Category, error)
+	Update(ctx context.Context, id string, entity types.Category) error
 	GetByName(ctx context.Context, name string) (*types.Category, error)
 }
 
@@ -24,7 +27,23 @@ func NewCategoryRepo(db *sql.DB) CategoryRepo {
 }
 
 func (c *categoryRepo) GetAll(ctx context.Context) ([]types.Category, error) {
-	return nil, errors.New("not implemented")
+	q := `
+		SELECT id, name FROM categories;
+	`
+	row, err := c.db.QueryContext(ctx, q)
+	if err != nil {
+		return nil, err
+	}
+	categories := []types.Category{}
+	for row.Next() {
+		category := types.Category{}
+		row.Scan(
+			&category.Id,
+			&category.Name,
+		)
+		categories = append(categories, category)
+	}
+	return categories, nil
 }
 
 func (c *categoryRepo) Create(ctx context.Context, entity types.Category) error {

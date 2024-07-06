@@ -8,20 +8,19 @@ type Article struct {
 	Body          string
 	CommitCreated string
 	CommitId      string
+	CommitAuthor  string
 }
 
 type Commit struct {
-	Id             string
-	Title          string
-	Body           string
-	Created        string
-	AuthorId       string
-	AuthorUsername string
-	ArticleId      string
+	Id        string
+	Title     string
+	Body      string
+	Created   string
+	Author    string
+	ArticleId string
 }
 
 type Account struct {
-	Id       string
 	Username string
 	Password string
 	Salt     string

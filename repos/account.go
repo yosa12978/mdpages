@@ -9,7 +9,10 @@ import (
 )
 
 type AccountRepo interface {
-	CRUD[types.Account]
+	GetAll(ctx context.Context) ([]types.Account, error)
+	Create(ctx context.Context, account types.Account) error
+	Delete(ctx context.Context, username string) error
+	Update(ctx context.Context, username string, account types.Account) error
 	GetByUsername(ctx context.Context, username string) (*types.Account, error)
 }
 
@@ -30,16 +33,14 @@ func (a *accountRepo) GetAll(ctx context.Context) ([]types.Account, error) {
 func (a *accountRepo) Create(ctx context.Context, account types.Account) error {
 	q := `
 		INSERT INTO accounts (
-			id, 
 			username, 
 			password, 
 			salt, 
 			created, 
 			role
-		) VALUES ($1, $2, $3, $4, $5);
+		) VALUES ($1, $2, $3, $4);
 	`
 	_, err := a.db.ExecContext(ctx, q,
-		account.Id,
 		account.Username,
 		account.Password,
 		account.Salt,
@@ -49,44 +50,33 @@ func (a *accountRepo) Create(ctx context.Context, account types.Account) error {
 	return err
 }
 
-func (a *accountRepo) Delete(ctx context.Context, accountId string) error {
+func (a *accountRepo) Delete(ctx context.Context, username string) error {
 	q := `
-		DELETE FROM accounts WHERE id=$1;
+		DELETE FROM accounts WHERE username=$1;
 	`
-	_, err := a.db.ExecContext(ctx, q, accountId)
+	_, err := a.db.ExecContext(ctx, q, username)
 	return err
-}
-
-func (a *accountRepo) GetById(ctx context.Context, id string) (*types.Account, error) {
-	q := `
-		SELECT id, username, password, salt, created, role FROM accounts WHERE id = $1;
-	`
-	user_row := a.db.QueryRowContext(ctx, q, id)
-	user := types.Account{}
-	err := user_row.Scan(&user.Id, &user.Username, &user.Password, &user.Salt, &user.Created, &user.Role)
-	return &user, err
 }
 
 func (a *accountRepo) GetByUsername(ctx context.Context, username string) (*types.Account, error) {
 	q := `
-		SELECT id, username, password, salt, created, role FROM accounts WHERE username = $1;
+		SELECT username, password, salt, created, role FROM accounts WHERE username = $1;
 	`
 	user_row := a.db.QueryRowContext(ctx, q, username)
 	user := types.Account{}
-	err := user_row.Scan(&user.Id, &user.Username, &user.Password, &user.Salt, &user.Created, &user.Role)
+	err := user_row.Scan(&user.Username, &user.Password, &user.Salt, &user.Created, &user.Role)
 	return &user, err
 }
 
-func (a *accountRepo) Update(ctx context.Context, accountId string, account types.Account) error {
+func (a *accountRepo) Update(ctx context.Context, username string, account types.Account) error {
 	q := `
-		UPDATE accounts SET username=$1, password=$2, salt=$3, role=$4 WHERE id=$5;
+		UPDATE accounts SET password=$1, salt=$2, role=$3 WHERE username=$4;
 	`
 	_, err := a.db.ExecContext(ctx, q,
-		account.Username,
 		account.Password,
 		account.Salt,
 		account.Role,
-		accountId,
+		username,
 	)
 	return err
 }

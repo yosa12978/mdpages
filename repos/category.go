@@ -9,6 +9,7 @@ import (
 
 type CategoryRepo interface {
 	GetAll(ctx context.Context) ([]types.Category, error)
+	GetSubcategories(ctx context.Context, id string) ([]types.Category, error)
 	Create(ctx context.Context, entity types.Category) error
 	Delete(ctx context.Context, id string) error
 	GetById(ctx context.Context, id string) (*types.Category, error)
@@ -26,9 +27,41 @@ func NewCategoryRepo(db *sql.DB) CategoryRepo {
 	}
 }
 
+func (c *categoryRepo) GetSubcategories(ctx context.Context, id string) ([]types.Category, error) {
+	q := `
+		WITH RECURSIVE subcategories (
+			SELECT id, parent_id, 0 AS depth FROM categories 
+			WHERE id=$1
+			
+		UNION ALL
+			
+			SELECT c.id, c.parent_id, s.depth+1 
+			FROM categories c 
+			INNER JOIN subcategories s
+			ON c.parent_id = s.id
+		)
+		SELECT c.id, c.name FROM subcategories s 
+		INNER JOIN categories c 
+		ON c.id = s.id
+		WHERE s.depth = 1;
+	`
+	row, err := c.db.QueryContext(ctx, q, id)
+	if err != nil {
+		return nil, err
+	}
+	categories := []types.Category{}
+	for row.Next() {
+		category := types.Category{}
+		row.Scan(&category.Id, &category.Name)
+		category.ParentId = id
+		categories = append(categories, category)
+	}
+	return categories, nil
+}
+
 func (c *categoryRepo) GetAll(ctx context.Context) ([]types.Category, error) {
 	q := `
-		SELECT id, name FROM categories;
+		SELECT id, name FROM categories WHERE parent_id IS NULL;
 	`
 	row, err := c.db.QueryContext(ctx, q)
 	if err != nil {

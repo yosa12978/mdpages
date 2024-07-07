@@ -12,7 +12,7 @@ import (
 
 type CategoryService interface {
 	Seed(ctx context.Context) error
-	Create(ctx context.Context, name string) error
+	Create(ctx context.Context, dto types.CategoryCreateDto) error
 }
 
 type categoryService struct {
@@ -26,21 +26,34 @@ func NewCategoryService(categoryRepo repos.CategoryRepo) CategoryService {
 }
 
 // Create implements CategoryService.
-func (c *categoryService) Create(ctx context.Context, name string) error {
-	if strings.TrimSpace(name) == "" || len(name) > 40 {
+func (c *categoryService) Create(ctx context.Context, dto types.CategoryCreateDto) error {
+	nameTrimmed := strings.TrimSpace(dto.Name)
+	if nameTrimmed == "" || len(nameTrimmed) > 40 {
 		return errors.New("len(name) is either >40 or =0")
 	}
+	// check here if parent category exist
 	return c.categoryRepo.Create(ctx, types.Category{
-		Id:   uuid.NewString(),
-		Name: name,
+		Id:       uuid.NewString(),
+		Name:     nameTrimmed,
+		ParentId: dto.ParentId,
 	})
 }
 
 // Seed implements CategoryService.
 func (c *categoryService) Seed(ctx context.Context) error {
-	c.Create(ctx, "first category")
-	c.Create(ctx, "second category")
-	c.Create(ctx, "third category")
-	c.Create(ctx, "fourth category")
-	return nil
+	mainId := uuid.NewString()
+	childId := uuid.NewString()
+	if err := c.categoryRepo.Create(ctx, types.Category{
+		Id:       mainId,
+		Name:     "Main Category",
+		ParentId: "",
+	}); err != nil {
+		return err
+	}
+	err := c.categoryRepo.Create(ctx, types.Category{
+		Id:       childId,
+		Name:     "Subcategory 1",
+		ParentId: mainId,
+	})
+	return err
 }

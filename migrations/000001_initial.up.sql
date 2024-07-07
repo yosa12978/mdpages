@@ -1,11 +1,13 @@
 CREATE TABLE IF NOT EXISTS categories (
     id VARCHAR(36) PRIMARY KEY,
-    name VARCHAR(40) NOT NULL
+    name VARCHAR(40) NOT NULL,
+    parent_id VARCHAR(36) NULL,
+    FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS articles (
     id VARCHAR(36) PRIMARY KEY,
-    category_id VARCHAR(36),
+    category_id VARCHAR(36) NULL,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
 );
 

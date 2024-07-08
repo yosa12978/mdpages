@@ -8,7 +8,7 @@ import (
 )
 
 type CategoryRepo interface {
-	GetAll(ctx context.Context) ([]types.Category, error)
+	GetRootCategories(ctx context.Context) ([]types.Category, error)
 	GetSubcategories(ctx context.Context, id string) ([]types.Category, error)
 	Create(ctx context.Context, entity types.Category) error
 	Delete(ctx context.Context, id string) error
@@ -59,7 +59,7 @@ func (c *categoryRepo) GetSubcategories(ctx context.Context, id string) ([]types
 	return categories, nil
 }
 
-func (c *categoryRepo) GetAll(ctx context.Context) ([]types.Category, error) {
+func (c *categoryRepo) GetRootCategories(ctx context.Context) ([]types.Category, error) {
 	q := `
 		SELECT id, name FROM categories WHERE parent_id IS NULL;
 	`

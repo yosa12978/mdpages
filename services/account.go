@@ -50,10 +50,9 @@ func (a *accountService) Seed(ctx context.Context) error {
 	}); err != nil {
 		return err
 	}
-	err := a.Create(ctx, types.AccountCreateDto{
+	return a.Create(ctx, types.AccountCreateDto{
 		Username: "user",
 		Password: "user1234",
 		Role:     "USER",
 	})
-	return err
 }

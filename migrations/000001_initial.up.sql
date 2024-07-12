@@ -5,6 +5,15 @@ CREATE TABLE IF NOT EXISTS categories (
     FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS accounts (
+    username VARCHAR(36) NOT NULL,
+    password VARCHAR(64) NOT NULL,
+    salt VARCHAR(36) NOT NULL,
+    created TIMESTAMP NOT NULL,
+    role VARCHAR(10) NOT NULL,
+    PRIMARY KEY (username)
+);
+
 CREATE TABLE IF NOT EXISTS articles (
     id VARCHAR(36) PRIMARY KEY,
     category_id VARCHAR(36) NULL,
@@ -18,13 +27,6 @@ CREATE TABLE IF NOT EXISTS commits (
     article_id VARCHAR(36) NOT NULL,
     author VARCHAR(36) NOT NULL,
     created TIMESTAMP NOT NULL,
+    FOREIGN KEY (author) REFERENCES accounts(username) ON DELETE CASCADE,
     FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE 
-);
-
-CREATE TABLE IF NOT EXISTS accounts (
-    username VARCHAR(36) PRIMARY KEY NOT NULL,
-    password VARCHAR(64) NOT NULL,
-    salt VARCHAR(36) NOT NULL,
-    created TIMESTAMP NOT NULL,
-    role VARCHAR(10) NOT NULL
 );

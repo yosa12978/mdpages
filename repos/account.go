@@ -38,7 +38,7 @@ func (a *accountRepo) Create(ctx context.Context, account types.Account) error {
 			salt, 
 			created, 
 			role
-		) VALUES ($1, $2, $3, $4);
+		) VALUES ($1, $2, $3, $4, $5);
 	`
 	_, err := a.db.ExecContext(ctx, q,
 		account.Username,

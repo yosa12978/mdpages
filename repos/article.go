@@ -26,20 +26,32 @@ func NewArticleRepo(db *sql.DB) ArticleRepo {
 }
 
 func (a *articleRepo) Create(ctx context.Context, entity types.Article) error {
-	q := `
+	tx, err := a.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	q1 := `
 		INSERT INTO articles (id, category_id) VALUES ($1, $2);
+	`
+	q2 := `
 		INSERT INTO commits (
 			id, 
 			title, 
 			body, 
 			article_id, 
-			author_id, 
+			author, 
 			created
-		) VALUES ($3, $4, $5, $6, $7, $8);
+		) VALUES ($1, $2, $3, $4, $5, $6);
 	`
-	_, err := a.db.ExecContext(ctx, q,
+	_, err = tx.ExecContext(ctx, q1,
 		entity.Id,
 		entity.CategoryId,
+	)
+	if err != nil {
+		return err
+	}
+	_, err = tx.ExecContext(ctx, q2,
 		entity.CommitId,
 		entity.Title,
 		entity.Body,
@@ -47,7 +59,10 @@ func (a *articleRepo) Create(ctx context.Context, entity types.Article) error {
 		entity.CommitAuthor,
 		entity.CommitCreated,
 	)
-	return err
+	if err != nil {
+		return err
+	}
+	return tx.Commit()
 }
 
 func (a *articleRepo) Delete(ctx context.Context, id string) error {

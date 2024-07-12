@@ -38,5 +38,5 @@ func (c *commitService) Create(ctx context.Context, dto types.CommitCreateDto) e
 
 // Seed implements CommitService.
 func (c *commitService) Seed(ctx context.Context) error {
-	panic("unimplemented")
+	return nil
 }

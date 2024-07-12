@@ -37,7 +37,7 @@ func (a *accountService) Create(ctx context.Context, dto types.AccountCreateDto)
 		Password: hashedPassword,
 		Salt:     salt,
 		Created:  time.Now().Format(time.RFC3339),
-		Role:     "USER",
+		Role:     dto.Role,
 	})
 }
 

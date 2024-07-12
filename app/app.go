@@ -2,7 +2,7 @@ package app
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	"github.com/yosa12978/mdpages/logging"
 )
 
 func init() {
@@ -21,12 +22,15 @@ func init() {
 }
 
 func Run() error {
+	logger := logging.NewLogger(os.Stdin)
+
 	ctx, cancel := signal.NotifyContext(
 		context.Background(),
 		os.Interrupt,
 		syscall.SIGTERM,
 	)
 	defer cancel()
+
 	server := http.Server{
 		Addr:    os.Getenv("ADDR"),
 		Handler: NewRouter(ctx),
@@ -34,7 +38,7 @@ func Run() error {
 
 	errCh := make(chan error, 1)
 	go func() {
-		log.Printf("server listening on %v\n", server.Addr)
+		logger.Info(fmt.Sprintf("server listening on %v", server.Addr))
 		if err := server.ListenAndServe(); err != nil {
 			errCh <- err
 		}
@@ -51,6 +55,7 @@ func Run() error {
 		)
 		defer cancel()
 		err = server.Shutdown(timeout)
+		logger.Info("server shutdown successfully")
 	}
 	return err
 }

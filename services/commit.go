@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/yosa12978/mdpages/logging"
 	"github.com/yosa12978/mdpages/repos"
 	"github.com/yosa12978/mdpages/types"
 )
@@ -16,11 +17,16 @@ type CommitService interface {
 
 type commitService struct {
 	commitRepo repos.CommitRepo
+	logger     logging.Logger
 }
 
-func NewCommitService(commitRepo repos.CommitRepo) CommitService {
+func NewCommitService(
+	commitRepo repos.CommitRepo,
+	logger logging.Logger,
+) CommitService {
 	return &commitService{
 		commitRepo: commitRepo,
+		logger:     logger,
 	}
 }
 

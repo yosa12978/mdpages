@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/yosa12978/mdpages/logging"
 	"github.com/yosa12978/mdpages/repos"
 	"github.com/yosa12978/mdpages/types"
 )
@@ -17,11 +18,16 @@ type CategoryService interface {
 
 type categoryService struct {
 	categoryRepo repos.CategoryRepo
+	logger       logging.Logger
 }
 
-func NewCategoryService(categoryRepo repos.CategoryRepo) CategoryService {
+func NewCategoryService(
+	categoryRepo repos.CategoryRepo,
+	logger logging.Logger,
+) CategoryService {
 	return &categoryService{
 		categoryRepo: categoryRepo,
+		logger:       logger,
 	}
 }
 

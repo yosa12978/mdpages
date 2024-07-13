@@ -17,3 +17,9 @@ func NewLogger(w io.Writer) Logger {
 		logger: slog.New(slog.NewTextHandler(w, nil)),
 	}
 }
+
+func NewLoggerWithSource(w io.Writer) Logger {
+	return &slogLogger{
+		logger: slog.New(slog.NewTextHandler(w, &slog.HandlerOptions{AddSource: true})),
+	}
+}

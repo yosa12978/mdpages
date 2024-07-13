@@ -2,27 +2,51 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/yosa12978/mdpages/logging"
 	"github.com/yosa12978/mdpages/repos"
 	"github.com/yosa12978/mdpages/types"
 	"github.com/yosa12978/mdpages/util"
 )
 
 type AccountService interface {
+	GetByUsername(ctx context.Context, username string) (*types.Account, error)
+	GetByCredentials(ctx context.Context, username, password string) (*types.Account, error)
 	Create(ctx context.Context, dto types.AccountCreateDto) error
 	Seed(ctx context.Context) error
 }
 
 type accountService struct {
 	accountRepo repos.AccountRepo
+	logger      logging.Logger
 }
 
-func NewAccountService(accountRepo repos.AccountRepo) AccountService {
+func NewAccountService(
+	accountRepo repos.AccountRepo,
+	logger logging.Logger,
+) AccountService {
 	return &accountService{
 		accountRepo: accountRepo,
+		logger:      logger,
 	}
+}
+
+func (a *accountService) GetByUsername(ctx context.Context, username string) (*types.Account, error) {
+	return a.accountRepo.GetByUsername(ctx, username)
+}
+
+func (a *accountService) GetByCredentials(ctx context.Context, username, password string) (*types.Account, error) {
+	acc, err := a.GetByUsername(ctx, username)
+	if err != nil {
+		return nil, fmt.Errorf("user doesn't exist")
+	}
+	if util.CheckPasswordHash(password+acc.Salt, acc.Password) {
+		return nil, fmt.Errorf("user doesn't exist")
+	}
+	return acc, nil
 }
 
 // Create implements AccountService.

@@ -20,12 +20,12 @@ func NewRouter(ctx context.Context) http.Handler {
 	commitRepo := repos.NewCommitRepo(data.Postgres())
 	categoryRepo := repos.NewCategoryRepo(data.Postgres())
 
-	accountService := services.NewAccountService(accountRepo)
-	commitService := services.NewCommitService(commitRepo)
-	articleService := services.NewArticleService(articleRepo)
-	categoryService := services.NewCategoryService(categoryRepo)
+	logger := logging.NewLoggerWithSource(os.Stdout)
 
-	logger := logging.NewLogger(os.Stdout)
+	accountService := services.NewAccountService(accountRepo, logger)
+	commitService := services.NewCommitService(commitRepo, logger)
+	articleService := services.NewArticleService(articleRepo, logger)
+	categoryService := services.NewCategoryService(categoryRepo, logger)
 
 	if err := accountService.Seed(ctx); err != nil {
 		logger.Error(err.Error())
@@ -41,7 +41,7 @@ func NewRouter(ctx context.Context) http.Handler {
 	}
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		view.Index("me").Render(ctx, w)
+		view.Index("world").Render(ctx, w)
 	})
 	return router
 }

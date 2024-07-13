@@ -29,7 +29,7 @@ func NewCategoryRepo(db *sql.DB) CategoryRepo {
 
 func (c *categoryRepo) GetSubcategories(ctx context.Context, id string) ([]types.Category, error) {
 	q := `
-		WITH RECURSIVE subcategories (
+		WITH RECURSIVE subcategories AS (
 			SELECT id, parent_id, 0 AS depth FROM categories 
 			WHERE id=$1
 			
@@ -81,9 +81,9 @@ func (c *categoryRepo) GetRootCategories(ctx context.Context) ([]types.Category,
 
 func (c *categoryRepo) Create(ctx context.Context, entity types.Category) error {
 	q := `
-		INSERT INTO categories (id, name) VALUES ($1, $2);
+		INSERT INTO categories (id, name, parent_id) VALUES ($1, $2, $3);
 	`
-	_, err := c.db.ExecContext(ctx, q, entity.Id, entity.Name)
+	_, err := c.db.ExecContext(ctx, q, entity.Id, entity.Name, entity.ParentId)
 	return err
 }
 

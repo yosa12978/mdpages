@@ -8,6 +8,7 @@ import (
 )
 
 type ArticleRepo interface {
+	GetByCategoryId(ctx context.Context, categoryId string) ([]types.Article, error)
 	GetById(ctx context.Context, id string) (*types.Article, error)
 	GetAll(ctx context.Context) ([]types.Article, error)
 	Create(ctx context.Context, entity types.Article) error
@@ -23,6 +24,10 @@ func NewArticleRepo(db *sql.DB) ArticleRepo {
 	return &articleRepo{
 		db: db,
 	}
+}
+
+func (a *articleRepo) GetByCategoryId(ctx context.Context, categoryId string) ([]types.Article, error) {
+	panic("unimplemented")
 }
 
 func (a *articleRepo) Create(ctx context.Context, entity types.Article) error {
@@ -91,6 +96,9 @@ func (a *articleRepo) GetAll(ctx context.Context) ([]types.Article, error) {
 	`
 	rows, err := a.db.QueryContext(ctx, q)
 	if err != nil {
+		if err == sql.ErrNoRows { //exp
+			return nil, nil
+		}
 		return nil, err
 	}
 	articles := []types.Article{}

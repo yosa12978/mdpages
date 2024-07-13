@@ -5,23 +5,43 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/yosa12978/mdpages/logging"
 	"github.com/yosa12978/mdpages/repos"
 	"github.com/yosa12978/mdpages/types"
 )
 
 type ArticleService interface {
+	GetById(ctx context.Context, id string) (*types.Article, error)
+	GetByCategoryId(ctx context.Context, categoryId string) []types.Article
 	Create(ctx context.Context, dto types.ArticleCreateDto) error
 	Seed(ctx context.Context) error
 }
 
 type articleService struct {
+	logger      logging.Logger
 	articleRepo repos.ArticleRepo
 }
 
-func NewArticleService(articleRepo repos.ArticleRepo) ArticleService {
+func NewArticleService(
+	articleRepo repos.ArticleRepo,
+	logger logging.Logger,
+) ArticleService {
 	return &articleService{
 		articleRepo: articleRepo,
+		logger:      logger,
 	}
+}
+
+func (a *articleService) GetByCategoryId(ctx context.Context, categoryId string) []types.Article {
+	articles, err := a.articleRepo.GetByCategoryId(ctx, categoryId)
+	if err != nil {
+		return []types.Article{}
+	}
+	return articles
+}
+
+func (a *articleService) GetById(ctx context.Context, id string) (*types.Article, error) {
+	return a.articleRepo.GetById(ctx, id)
 }
 
 // Create implements ArticleService.

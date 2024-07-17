@@ -11,7 +11,12 @@ import (
 )
 
 type CommitService interface {
+	GetById(ctx context.Context, id string) (*types.Commit, error)
+	GetArticleCommits(ctx context.Context, articleId string) ([]types.Commit, error)
+
 	Create(ctx context.Context, dto types.CommitCreateDto) error
+	Delete(ctx context.Context, id string) error
+
 	Seed(ctx context.Context) error
 }
 
@@ -28,6 +33,17 @@ func NewCommitService(
 		commitRepo: commitRepo,
 		logger:     logger,
 	}
+}
+
+func (c *commitService) GetById(ctx context.Context, id string) (*types.Commit, error) {
+	return c.commitRepo.GetById(ctx, id)
+}
+func (c *commitService) GetArticleCommits(ctx context.Context, articleId string) ([]types.Commit, error) {
+	return c.commitRepo.GetArticleCommits(ctx, articleId)
+}
+
+func (c *commitService) Delete(ctx context.Context, id string) error {
+	return c.commitRepo.Delete(ctx, id)
 }
 
 // Create implements CommitService.

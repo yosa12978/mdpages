@@ -12,8 +12,15 @@ import (
 )
 
 type CategoryService interface {
-	Seed(ctx context.Context) error
+	GetSubcategories(ctx context.Context, parentId string) []types.Category
+	GetById(ctx context.Context, id string) (*types.Category, error)
+	GetRoots(ctx context.Context) []types.Category
+
 	Create(ctx context.Context, dto types.CategoryCreateDto) error
+	Update(ctx context.Context, id, name, parent_id string) error
+	Delete(ctx context.Context, id string) error
+
+	Seed(ctx context.Context) error
 }
 
 type categoryService struct {
@@ -29,6 +36,36 @@ func NewCategoryService(
 		categoryRepo: categoryRepo,
 		logger:       logger,
 	}
+}
+
+func (c *categoryService) GetSubcategories(ctx context.Context, parentId string) []types.Category {
+	categories, err := c.categoryRepo.GetSubcategories(ctx, parentId)
+	if err != nil {
+		c.logger.Error(err.Error())
+		return nil
+	}
+	return categories
+}
+
+func (c *categoryService) GetById(ctx context.Context, id string) (*types.Category, error) {
+	return c.categoryRepo.GetById(ctx, id)
+}
+
+func (c *categoryService) GetRoots(ctx context.Context) []types.Category {
+	categories, err := c.categoryRepo.GetRootCategories(ctx)
+	if err != nil {
+		c.logger.Error(err.Error())
+		return nil
+	}
+	return categories
+}
+
+func (c *categoryService) Update(ctx context.Context, id, name, parent_id string) error { // change this to CategoryUpdateDto
+	return c.categoryRepo.Update(ctx, id, types.Category{Id: id, Name: name, ParentId: parent_id})
+}
+
+func (c *categoryService) Delete(ctx context.Context, id string) error {
+	return c.categoryRepo.Delete(ctx, id)
 }
 
 // Create implements CategoryService.

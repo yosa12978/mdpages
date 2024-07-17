@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/yosa12978/mdpages/types"
+	"github.com/yosa12978/mdpages/util"
 )
 
 type ArticleRepo interface {
@@ -27,7 +28,37 @@ func NewArticleRepo(db *sql.DB) ArticleRepo {
 }
 
 func (a *articleRepo) GetByCategoryId(ctx context.Context, categoryId string) ([]types.Article, error) {
-	panic("unimplemented")
+	q := `
+		SELECT
+			a.id AS article_id, 
+			comm.id AS commit_id, 
+			comm.title AS title, 
+			comm.created AS last_updated
+		FROM articles a WHERE a.category_id = $1
+		INNER JOIN commits comm ON comm.id = (
+			SELECT id FROM commits WHERE article_id = a.id ORDER BY created DESC LIMIT 1
+		)  
+		ORDER BY title;
+	`
+	row, err := a.db.QueryContext(ctx, q, categoryId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, types.NewErrNotFound("articles not found")
+		}
+		return nil, err
+	}
+	articles := []types.Article{}
+	for row.Next() {
+		article := types.Article{}
+		row.Scan(
+			&article.Id,
+			&article.CommitId,
+			&article.Title,
+			&article.CommitCreated,
+		)
+		articles = append(articles, article)
+	}
+	return articles, nil
 }
 
 func (a *articleRepo) Create(ctx context.Context, entity types.Article) error {
@@ -51,7 +82,7 @@ func (a *articleRepo) Create(ctx context.Context, entity types.Article) error {
 	`
 	_, err = tx.ExecContext(ctx, q1,
 		entity.Id,
-		entity.CategoryId,
+		util.NewNullString(entity.CategoryId),
 	)
 	if err != nil {
 		return err
@@ -96,8 +127,8 @@ func (a *articleRepo) GetAll(ctx context.Context) ([]types.Article, error) {
 	`
 	rows, err := a.db.QueryContext(ctx, q)
 	if err != nil {
-		if err == sql.ErrNoRows { //exp
-			return nil, nil
+		if err == sql.ErrNoRows {
+			return nil, types.NewErrNotFound("articles not found")
 		}
 		return nil, err
 	}
@@ -143,6 +174,9 @@ func (a *articleRepo) GetById(ctx context.Context, id string) (*types.Article, e
 		&article.CommitCreated,
 		&article.Body,
 	)
+	if err == sql.ErrNoRows {
+		return nil, types.NewErrNotFound("article not found")
+	}
 	return &article, err
 }
 

@@ -32,6 +32,9 @@ func (c *commitRepo) GetArticleCommits(ctx context.Context, articleId string) ([
 	`
 	row, err := c.db.QueryContext(ctx, q, articleId)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, types.NewErrNotFound("commits not found")
+		}
 		return nil, err
 	}
 	commits := []types.Commit{}
@@ -89,5 +92,8 @@ func (c *commitRepo) GetById(ctx context.Context, id string) (*types.Commit, err
 		&commit.ArticleId,
 		&commit.Created,
 	)
+	if err == sql.ErrNoRows {
+		return nil, types.NewErrNotFound("commit not found")
+	}
 	return &commit, err
 }

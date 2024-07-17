@@ -41,7 +41,12 @@ func NewRouter(ctx context.Context) http.Handler {
 	}
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		view.Index("world").Render(ctx, w)
+		article, err := articleService.GetById(ctx, "home")
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		view.Index("mdpages - home", *article).Render(ctx, w)
 	})
 	return router
 }

@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -12,8 +13,12 @@ import (
 
 type ArticleService interface {
 	GetById(ctx context.Context, id string) (*types.Article, error)
+	GetHomePage(ctx context.Context) (*types.Article, error)
 	GetByCategoryId(ctx context.Context, categoryId string) []types.Article
+
 	Create(ctx context.Context, dto types.ArticleCreateDto) error
+	Delete(ctx context.Context, id string) error
+
 	Seed(ctx context.Context) error
 }
 
@@ -30,6 +35,36 @@ func NewArticleService(
 		articleRepo: articleRepo,
 		logger:      logger,
 	}
+}
+
+func (a *articleService) createHomePage(ctx context.Context) (*types.Article, error) {
+	article := types.Article{
+		Id:            "home",
+		CategoryId:    "",
+		CategoryName:  "",
+		Title:         "Home",
+		Body:          "This is default home page layout. You can change it by adding a new commit",
+		CommitCreated: time.Now().Format(time.RFC3339),
+		CommitId:      uuid.NewString(),
+		CommitAuthor:  "admin", // must be nil
+	}
+	err := a.articleRepo.Create(ctx, article)
+	return &article, err
+}
+
+func (a *articleService) GetHomePage(ctx context.Context) (*types.Article, error) {
+	article, err := a.articleRepo.GetById(ctx, "home")
+	var errNotFound *types.ErrNotFound
+	if errors.As(err, &errNotFound) {
+		a.logger.Error("home page not found")
+		article, err = a.createHomePage(ctx)
+		return article, err
+	}
+	return article, err
+}
+
+func (a *articleService) Delete(ctx context.Context, id string) error {
+	return a.articleRepo.Delete(ctx, id)
 }
 
 func (a *articleService) GetByCategoryId(ctx context.Context, categoryId string) []types.Article {

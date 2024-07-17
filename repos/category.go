@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/yosa12978/mdpages/types"
+	"github.com/yosa12978/mdpages/util"
 )
 
 type CategoryRepo interface {
@@ -47,6 +48,9 @@ func (c *categoryRepo) GetSubcategories(ctx context.Context, id string) ([]types
 	`
 	row, err := c.db.QueryContext(ctx, q, id)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, types.NewErrNotFound("categories not found")
+		}
 		return nil, err
 	}
 	categories := []types.Category{}
@@ -65,6 +69,9 @@ func (c *categoryRepo) GetRootCategories(ctx context.Context) ([]types.Category,
 	`
 	row, err := c.db.QueryContext(ctx, q)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, types.NewErrNotFound("categories not found")
+		}
 		return nil, err
 	}
 	categories := []types.Category{}
@@ -83,7 +90,10 @@ func (c *categoryRepo) Create(ctx context.Context, entity types.Category) error 
 	q := `
 		INSERT INTO categories (id, name, parent_id) VALUES ($1, $2, $3);
 	`
-	_, err := c.db.ExecContext(ctx, q, entity.Id, entity.Name, entity.ParentId)
+	_, err := c.db.ExecContext(ctx, q,
+		entity.Id,
+		entity.Name,
+		util.NewNullString(entity.ParentId))
 	return err
 }
 
@@ -102,6 +112,9 @@ func (c *categoryRepo) GetById(ctx context.Context, id string) (*types.Category,
 	category_row := c.db.QueryRowContext(ctx, q, id)
 	category := types.Category{}
 	err := category_row.Scan(&category.Id, &category.Name)
+	if err == sql.ErrNoRows {
+		return nil, types.NewErrNotFound("category not found")
+	}
 	return &category, err
 }
 
@@ -112,6 +125,9 @@ func (c *categoryRepo) GetByName(ctx context.Context, name string) (*types.Categ
 	category_row := c.db.QueryRowContext(ctx, q, name)
 	category := types.Category{}
 	err := category_row.Scan(&category.Id, &category.Name)
+	if err == sql.ErrNoRows {
+		return nil, types.NewErrNotFound("category not found")
+	}
 	return &category, err
 }
 

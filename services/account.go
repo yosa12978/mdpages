@@ -15,7 +15,10 @@ import (
 type AccountService interface {
 	GetByUsername(ctx context.Context, username string) (*types.Account, error)
 	GetByCredentials(ctx context.Context, username, password string) (*types.Account, error)
+
 	Create(ctx context.Context, dto types.AccountCreateDto) error
+	Delete(ctx context.Context, username string) error
+
 	Seed(ctx context.Context) error
 }
 
@@ -32,6 +35,10 @@ func NewAccountService(
 		accountRepo: accountRepo,
 		logger:      logger,
 	}
+}
+
+func (a *accountService) Delete(ctx context.Context, username string) error {
+	return a.accountRepo.Delete(ctx, username)
 }
 
 func (a *accountService) GetByUsername(ctx context.Context, username string) (*types.Account, error) {

@@ -10,7 +10,7 @@ import "context"
 import "io"
 import "bytes"
 
-func Base() templ.Component {
+func Base(title string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -23,7 +23,20 @@ func Base() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>mdpages - Home</title><link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css\" rel=\"stylesheet\" integrity=\"sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH\" crossorigin=\"anonymous\"><script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js\" integrity=\"sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz\" crossorigin=\"anonymous\"></script></head><body class=\"p-1\"><style>\n            @import \"https://www.nerdfonts.com/assets/css/webfont.css\";\n            @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');\n\n            body {\n                background-color: #FFFFFF;\n            }\n            hr {\n                border: 2px solid #121212;\n                opacity: 1;\n            }\n            .btn {\n                border-radius: 0px;\n                font-weight: 700;\n            }\n            * {\n                font-family: \"Rubik\", sans-serif;\n                font-optical-sizing: auto;\n                font-weight: 400;\n                font-style: normal;\n            }\n            .btn-outline-dark {\n                border: 3px solid;\n            }\n            .alert {\n                border-radius: 0px;\n                color: black;\n\n            }\n            .toc {\n                max-width: 400px;\n                width: auto;\n            }\n            .card {\n                border-radius: 0px;\n                border: 3px solid;\n            }\n            a {\n                color: black;\n            }\n        </style><div class=\"container border border-4 border-dark\"><div class=\"header navbar border-bottom border-4 border-dark mb-3\"><div class=\"float-start\"><a class=\"text-decoration-none text-dark\" href=\"/\"><h2>*mdpages</h2></a></div><div class=\"float-end\"><a class=\"btn btn-outline-dark m-1\" href=\"/\">Home</a> <a class=\"btn btn-outline-dark m-1\" href=\"/login\">Login</a></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var2 string
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(title)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/base.templ`, Line: 9, Col: 21}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css\" rel=\"stylesheet\" integrity=\"sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH\" crossorigin=\"anonymous\"><script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js\" integrity=\"sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz\" crossorigin=\"anonymous\"></script></head><body class=\"p-1\"><style>\n            @import \"https://www.nerdfonts.com/assets/css/webfont.css\";\n            @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');\n\n            body {\n                background-color: #FFFFFF;\n            }\n            hr {\n                border: 2px solid #121212;\n                opacity: 1;\n            }\n            .btn {\n                border-radius: 0px;\n                font-weight: 700;\n            }\n            * {\n                font-family: \"Rubik\", sans-serif;\n                font-optical-sizing: auto;\n                font-weight: 400;\n                font-style: normal;\n            }\n            .btn-outline-dark {\n                border: 3px solid;\n            }\n            .alert {\n                border-radius: 0px;\n                color: black;\n\n            }\n            .toc {\n                max-width: 400px;\n                width: auto;\n            }\n            .card {\n                border-radius: 0px;\n                border: 3px solid;\n            }\n            a {\n                color: black;\n            }\n        </style><div class=\"container border border-4 border-dark\"><div class=\"header navbar border-bottom border-4 border-dark mb-3\"><div class=\"float-start\"><a class=\"text-decoration-none text-dark\" href=\"/\"><h2>*mdpages</h2></a></div><div class=\"float-end\"><a class=\"btn btn-outline-dark m-1\" href=\"/\">Home</a> <a class=\"btn btn-outline-dark m-1\" href=\"/login\">Login</a></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

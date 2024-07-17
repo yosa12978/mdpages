@@ -65,6 +65,9 @@ func (a *accountRepo) GetByUsername(ctx context.Context, username string) (*type
 	user_row := a.db.QueryRowContext(ctx, q, username)
 	user := types.Account{}
 	err := user_row.Scan(&user.Username, &user.Password, &user.Salt, &user.Created, &user.Role)
+	if err == sql.ErrNoRows {
+		return nil, types.NewErrNotFound("user not found")
+	}
 	return &user, err
 }
 

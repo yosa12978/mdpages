@@ -1,0 +1,14 @@
+package view
+
+templ Login() {
+    @Base("mdpages - Login"){
+        <h1>Login</h1>
+        <form action="POST" style="max-width:500px;">
+            <label class="mt-2">Username</label>
+            <input type="text" name="username" class="form-control" placeholder="username"/>
+            <label class="mt-2">Password</label>
+            <input type="password" name="password" class="form-control" placeholder="password"/>
+            <button type="submit" class="btn btn-outline-dark mt-2" >Login</button>
+        </form>
+    }
+}

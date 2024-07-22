@@ -84,16 +84,17 @@ func (c *categoryService) Create(ctx context.Context, dto types.CategoryCreateDt
 
 // Seed implements CategoryService.
 func (c *categoryService) Seed(ctx context.Context) error {
-	if err := c.categoryRepo.Create(ctx, types.Category{
-		Id:       "39495288-dd70-43e5-9531-a57c24d0f3a4",
-		Name:     "Main Category",
-		ParentId: "",
-	}); err != nil {
-		return err
-	}
-	return c.categoryRepo.Create(ctx, types.Category{
-		Id:       "7b34ea11-57c3-46f0-80ef-e35e743d2889",
-		Name:     "Subcategory 1",
-		ParentId: "39495288-dd70-43e5-9531-a57c24d0f3a4",
-	})
+	return nil
+	// if err := c.categoryRepo.Create(ctx, types.Category{
+	// 	Id:       "39495288-dd70-43e5-9531-a57c24d0f3a4",
+	// 	Name:     "Main Category",
+	// 	ParentId: "",
+	// }); err != nil {
+	// 	return err
+	// }
+	// return c.categoryRepo.Create(ctx, types.Category{
+	// 	Id:       "7b34ea11-57c3-46f0-80ef-e35e743d2889",
+	// 	Name:     "Subcategory 1",
+	// 	ParentId: "39495288-dd70-43e5-9531-a57c24d0f3a4",
+	// })
 }

@@ -4,42 +4,24 @@ import (
     "github.com/yosa12978/mdpages/types"
 )
 
-templ Index(title string, article types.Article) {
+templ Hello(name string) {
+    @Base("hello page") {
+        <p>Hello {name}</p>
+    }
+} 
+
+templ Index(title string) {
 	@Base(title) {
-        <div class="m-md-5 row">
-            <div class="mb-md-5 mb-3 col-sm-8" id="article">
-                <h1>Page name</h1>
-                <span>Page content</span>
-            </div>
-        
-            <div class="col-sm-4 mb-4 mb-md-0 mx-auto">
-                <a class="btn btn-outline-dark mb-2 w-100" data-bs-toggle="collapse" data-bs-target="#pages" aria-expanded="true" aria-controls="pages">Pages</a>
-                <div id="pages" class="collapse show">
-                    <ul class="list-group card border-dark p-2 text-dark">
-                        <li class="list-group-item border-0"><a href="/">Page 1</a></li>
-                    </ul>
-                </div>
-            </div>
+        <div hx-get="/htmx/home" hx-trigger="load" hx-swap="outerHTML">
         </div>
 	}
 }
 
-templ Page() {
-	// index
-    <div class="m-md-5 row">
-        <div class="mb-md-5 mb-3 col-sm-8" id="article">
-            <h1>Page name</h1>
-            <span>Page content</span>
-        </div>
-    
-        <div class="col-sm-4 mb-4 mb-md-0 mx-auto">
-            <a class="btn btn-outline-dark mb-2 w-100" data-bs-toggle="collapse" data-bs-target="#pages" aria-expanded="true" aria-controls="pages">Pages</a>
-            <div id="pages" class="collapse show">
-                <ul class="list-group card border-dark p-2 text-dark">
-                    <li class="list-group-item border-0"><a href="/">Page 1</a></li>
-                </ul>
-            </div>
-        </div>
+templ Page(article types.Article) {
+    <div class="mb-3" id="article">
+        <h1>{article.Title}</h1>
+        <a href={ templ.URL("/commits/"+article.Id) }>Commit History</a><br><br>
+        <span>{article.Body}</span>
     </div>
 }
 

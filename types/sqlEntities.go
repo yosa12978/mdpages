@@ -1,50 +1,41 @@
 package types
 
-type Article struct {
+import "database/sql"
+
+type ArticleEntity struct {
 	Id            string
-	CategoryId    string
-	CategoryName  string
+	CategoryId    sql.NullString
+	CategoryName  sql.NullString
 	Title         string
 	Body          string
 	CommitCreated string
 	CommitId      string
 	CommitAuthor  string
-	RGroups       []Group
-	WGroups       []Group
 }
 
-type Commit struct {
+type CommitEntity struct {
 	Id        string
 	Title     string
 	Body      string
 	Created   string
 	Author    string
 	ArticleId string
-	Groups    []Group
 }
 
-type Account struct {
+type AccountEntity struct {
 	Username string
 	Password string
 	Salt     string
 	Created  string
-	Groups   []Group
 }
 
-type GroupType rune
-
-const (
-	RGroup GroupType = 'r'
-	WGroup GroupType = 'w'
-)
-
-type Category struct {
+type CategoryEntity struct {
 	Id       string
 	Name     string
-	ParentId string
+	ParentId sql.NullString
 }
 
-type Group struct {
+type GroupEntity struct {
 	Id   string
 	Name string
 }

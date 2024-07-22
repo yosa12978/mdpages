@@ -33,7 +33,7 @@ func (c *commitRepo) GetArticleCommits(ctx context.Context, articleId string) ([
 	row, err := c.db.QueryContext(ctx, q, articleId)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, types.NewErrNotFound("commits not found")
+			return []types.Commit{}, types.NewErrNotFound("commits not found")
 		}
 		return nil, err
 	}

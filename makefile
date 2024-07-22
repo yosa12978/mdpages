@@ -1,4 +1,5 @@
 build:
+	@templ generate
 	@go build -o bin/mdpages ./cmd/mdpages/main.go
 	@cp .env bin
 

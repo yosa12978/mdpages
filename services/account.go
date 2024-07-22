@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -19,25 +20,31 @@ type AccountService interface {
 	Create(ctx context.Context, dto types.AccountCreateDto) error
 	Delete(ctx context.Context, username string) error
 
-	Seed(ctx context.Context) error
+	Seed(ctx context.Context, rootPassword string) error
 }
 
 type accountService struct {
-	accountRepo repos.AccountRepo
-	logger      logging.Logger
+	accountRepo  repos.AccountRepo
+	groupService GroupService
+	logger       logging.Logger
 }
 
 func NewAccountService(
 	accountRepo repos.AccountRepo,
+	groupService GroupService,
 	logger logging.Logger,
 ) AccountService {
 	return &accountService{
-		accountRepo: accountRepo,
-		logger:      logger,
+		accountRepo:  accountRepo,
+		groupService: groupService,
+		logger:       logger,
 	}
 }
 
 func (a *accountService) Delete(ctx context.Context, username string) error {
+	if username == "root" {
+		return errors.New("can't delete root user")
+	}
 	return a.accountRepo.Delete(ctx, username)
 }
 
@@ -68,22 +75,16 @@ func (a *accountService) Create(ctx context.Context, dto types.AccountCreateDto)
 		Password: hashedPassword,
 		Salt:     salt,
 		Created:  time.Now().Format(time.RFC3339),
-		Role:     dto.Role,
 	})
 }
 
 // Seed implements AccountService.
-func (a *accountService) Seed(ctx context.Context) error {
+func (a *accountService) Seed(ctx context.Context, rootPassword string) error {
 	if err := a.Create(ctx, types.AccountCreateDto{
-		Username: "admin",
-		Password: "admin1234",
-		Role:     "ADMIN",
+		Username: "root",
+		Password: rootPassword,
 	}); err != nil {
-		return err
+		a.logger.Error(err.Error())
 	}
-	return a.Create(ctx, types.AccountCreateDto{
-		Username: "user",
-		Password: "user1234",
-		Role:     "USER",
-	})
+	return a.groupService.AddUser(ctx, "root", "root")
 }

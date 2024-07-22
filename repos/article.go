@@ -15,6 +15,11 @@ type ArticleRepo interface {
 	Create(ctx context.Context, entity types.Article) error
 	Update(ctx context.Context, id string, entity types.Article) error
 	Delete(ctx context.Context, id string) error
+
+	AddRGroup(ctx context.Context, article_id, group_id string) error
+	AddWGroup(ctx context.Context, article_id, group_id string) error
+	RemoveRGroup(ctx context.Context, article_id, group_id string) error
+	RemoveWGroup(ctx context.Context, article_id, group_id string) error
 }
 
 type articleRepo struct {
@@ -25,6 +30,39 @@ func NewArticleRepo(db *sql.DB) ArticleRepo {
 	return &articleRepo{
 		db: db,
 	}
+}
+
+func (g *articleRepo) AddRGroup(ctx context.Context, article_id, group_id string) error {
+	q := `
+		INSERT INTO r_articles_groups(article_id, group_id)
+		VALUES ($1, $2)
+	`
+	_, err := g.db.ExecContext(ctx, q, article_id, group_id)
+	return err
+}
+func (g *articleRepo) AddWGroup(ctx context.Context, article_id, group_id string) error {
+	q := `
+		INSERT INTO w_articles_groups(article_id, group_id)
+		VALUES ($1, $2)
+	`
+	_, err := g.db.ExecContext(ctx, q, article_id, group_id)
+	return err
+}
+
+func (g *articleRepo) RemoveRGroup(ctx context.Context, article_id, group_id string) error {
+	q := `
+		DELETE FROM r_articles_groups WHERE article_id=$1 AND group_id=$2;
+	`
+	_, err := g.db.ExecContext(ctx, q, article_id, group_id)
+	return err
+}
+
+func (g *articleRepo) RemoveWGroup(ctx context.Context, article_id, group_id string) error {
+	q := `
+		DELETE FROM w_articles_groups WHERE article_id=$1 AND group_id=$2;
+	`
+	_, err := g.db.ExecContext(ctx, q, article_id, group_id)
+	return err
 }
 
 func (a *articleRepo) GetByCategoryId(ctx context.Context, categoryId string) ([]types.Article, error) {
@@ -43,7 +81,7 @@ func (a *articleRepo) GetByCategoryId(ctx context.Context, categoryId string) ([
 	row, err := a.db.QueryContext(ctx, q, categoryId)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, types.NewErrNotFound("articles not found")
+			return []types.Article{}, types.NewErrNotFound("articles not found")
 		}
 		return nil, err
 	}
@@ -128,7 +166,7 @@ func (a *articleRepo) GetAll(ctx context.Context) ([]types.Article, error) {
 	rows, err := a.db.QueryContext(ctx, q)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, types.NewErrNotFound("articles not found")
+			return []types.Article{}, types.NewErrNotFound("articles not found")
 		}
 		return nil, err
 	}
@@ -159,21 +197,25 @@ func (a *articleRepo) GetById(ctx context.Context, id string) (*types.Article, e
 			comm.created AS last_updated,
 			comm.body AS body
 		FROM articles a 
-		INNER JOIN categories categ ON categ.id = a.category_id
+		LEFT JOIN categories categ ON categ.id = a.category_id
 		INNER JOIN commits comm ON comm.article_id = $1 
 		ORDER BY last_updated DESC LIMIT 1;
 	`
 	article_row := a.db.QueryRowContext(ctx, q, id)
 	article := types.Article{}
+	var categoryId sql.NullString
+	var categoryName sql.NullString
 	err := article_row.Scan(
 		&article.Id,
-		&article.CategoryId,
-		&article.CategoryName,
+		&categoryId,
+		&categoryName,
 		&article.CommitId,
 		&article.Title,
 		&article.CommitCreated,
 		&article.Body,
 	)
+	article.CategoryId = categoryId.String // instead of this make sql entities and then fetch into them
+	article.CategoryName = categoryName.String
 	if err == sql.ErrNoRows {
 		return nil, types.NewErrNotFound("article not found")
 	}

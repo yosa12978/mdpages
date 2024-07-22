@@ -49,7 +49,7 @@ func (c *categoryRepo) GetSubcategories(ctx context.Context, id string) ([]types
 	row, err := c.db.QueryContext(ctx, q, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, types.NewErrNotFound("categories not found")
+			return []types.Category{}, types.NewErrNotFound("categories not found")
 		}
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (c *categoryRepo) GetRootCategories(ctx context.Context) ([]types.Category,
 	row, err := c.db.QueryContext(ctx, q)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, types.NewErrNotFound("categories not found")
+			return []types.Category{}, types.NewErrNotFound("categories not found")
 		}
 		return nil, err
 	}

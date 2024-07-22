@@ -36,16 +36,14 @@ func (a *accountRepo) Create(ctx context.Context, account types.Account) error {
 			username, 
 			password, 
 			salt, 
-			created, 
-			role
-		) VALUES ($1, $2, $3, $4, $5);
+			created 
+		) VALUES ($1, $2, $3, $4);
 	`
 	_, err := a.db.ExecContext(ctx, q,
 		account.Username,
 		account.Password,
 		account.Salt,
 		account.Created,
-		account.Role,
 	)
 	return err
 }
@@ -60,11 +58,11 @@ func (a *accountRepo) Delete(ctx context.Context, username string) error {
 
 func (a *accountRepo) GetByUsername(ctx context.Context, username string) (*types.Account, error) {
 	q := `
-		SELECT username, password, salt, created, role FROM accounts WHERE username = $1;
+		SELECT username, password, salt, created FROM accounts WHERE username = $1;
 	`
 	user_row := a.db.QueryRowContext(ctx, q, username)
 	user := types.Account{}
-	err := user_row.Scan(&user.Username, &user.Password, &user.Salt, &user.Created, &user.Role)
+	err := user_row.Scan(&user.Username, &user.Password, &user.Salt, &user.Created)
 	if err == sql.ErrNoRows {
 		return nil, types.NewErrNotFound("user not found")
 	}
@@ -73,12 +71,11 @@ func (a *accountRepo) GetByUsername(ctx context.Context, username string) (*type
 
 func (a *accountRepo) Update(ctx context.Context, username string, account types.Account) error {
 	q := `
-		UPDATE accounts SET password=$1, salt=$2, role=$3 WHERE username=$4;
+		UPDATE accounts SET password=$1, salt=$2 WHERE username=$3;
 	`
 	_, err := a.db.ExecContext(ctx, q,
 		account.Password,
 		account.Salt,
-		account.Role,
 		username,
 	)
 	return err

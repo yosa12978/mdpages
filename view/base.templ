@@ -69,7 +69,7 @@ templ Base(title string) {
                 font-weight: 500;
             }
         </style>
-        <div class="container border border-4 border-dark">
+        <div class="container border border-4 border-dark d-flex flex-column" style="min-height: 99vh;">
 
         <div class="header navbar border-bottom border-4 border-dark mb-3">
             <div class="float-start">
@@ -86,7 +86,7 @@ templ Base(title string) {
         { children... }
         </div>
 
-        <div class="footer p-2 border-top border-4 border-dark mt-4">mdpages - <a href="/privacy">Privacy</a></div>
+        <div class="footer p-2 border-top border-4 border-dark mt-auto">mdpages - <a href="/privacy">Privacy</a></div>
     </div>
 </body>
 </html>

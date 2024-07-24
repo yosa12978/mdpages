@@ -1,7 +1,9 @@
 package view
 
-templ Signup() {
-    @Base("mdpages - Signup"){
+import "github.com/yosa12978/mdpages/types"
+
+templ Signup(data types.TemplData) {
+    @Base(data){
         <script>
         var check = function() {
             if (document.getElementById('password').value !=
@@ -16,16 +18,17 @@ templ Signup() {
             }
         }
         </script>
-        <h1>Signup</h1>
-        <form method="POST" action="/htmx/signup" style="max-width:500px;">
-            <label class="mt-2">Username</label>
-            <input type="text" name="username" class="form-control" placeholder="username"/>
-            <label class="mt-2">Password</label>
-            <input type="password" name="password" class="form-control" id="password"  onkeyup="check();" placeholder="password"/>
-            <label class="mt-2">Confirm password</label>
-            <input type="password" name="confirm_password" class="form-control" id="confirm_password" onkeyup="check();" placeholder="confirm password"/>
-            <span id='message' class=""></span>
-            <button type="submit" id="submit" class="btn btn-outline-dark mt-2" >Signup</button>
+        <h1 class="mb-2">Signup</h1>
+        <form hx-post="/htmx/signup" hx-target="#red-box" hx-swap="innerHTML" hx-ext="json-enc" style="max-width:500px;">
+            <div id="red-box" class="alert alert-danger border border-4 border-danger"></div>
+            <label>Username</label>
+            <input type="text" name="username" class="form-control mb-2" placeholder="username"/>
+            <label>Password</label>
+            <input type="password" name="password" class="form-control mb-2" id="password"  onkeyup="check();" placeholder="password"/>
+            <label>Confirm password</label>
+            <input type="password" name="confirm_password" class="form-control mb-2" id="confirm_password" onkeyup="check();" placeholder="confirm password"/>
+            <span id='message' class="text-danger"></span>
+            <button type="submit" id="submit" class="btn btn-outline-dark" >Signup</button>
         </form>
     }
 }

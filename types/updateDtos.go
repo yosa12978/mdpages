@@ -19,10 +19,3 @@ type AccountUpdateDto struct {
 type GroupUpdateDto struct {
 	Name string
 }
-
-type SessionInfo struct {
-	Username  string  `json:"username"`
-	Groups    []Group `json:"groups"`
-	Timestamp int64   `json:"timestamp"`
-	LoggedIn  bool    `json:"logged_in"`
-}

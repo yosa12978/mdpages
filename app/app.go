@@ -11,6 +11,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/yosa12978/mdpages/logging"
+	"github.com/yosa12978/mdpages/session"
 )
 
 func init() {
@@ -30,6 +31,8 @@ func Run() error {
 		syscall.SIGTERM,
 	)
 	defer cancel()
+
+	session.SetupStore()
 
 	server := http.Server{
 		Addr:    os.Getenv("ADDR"),

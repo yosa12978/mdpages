@@ -48,3 +48,13 @@ type Group struct {
 	Id   string
 	Name string
 }
+
+type Session struct {
+	Username string  `json:"username"`
+	Groups   []Group `json:"groups"`
+}
+
+type TemplData struct {
+	User  *Session
+	Title string
+}

@@ -1,28 +1,38 @@
 package session
 
 import (
-	"encoding/json"
+	"encoding/gob"
 	"errors"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/gorilla/sessions"
 	"github.com/yosa12978/mdpages/types"
 )
 
-var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
+var (
+	store *sessions.CookieStore
+)
 
-func GetKey(r *http.Request, key string) (any, error) {
-	session, err := store.Get(r, "user_store")
-	if err != nil { // without this may throw null pointer exception
-		return nil, err
-	}
-	return session.Values[key], err
+func init() {
+	gob.Register(types.Session{})
+	gob.Register([]types.Group{})
 }
 
-func SetKey(r *http.Request, w http.ResponseWriter, key string, value any) error {
-	session, err := store.Get(r, "user_store")
+func SetupStore() {
+	store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
+}
+
+func Get(r *http.Request, key string) (interface{}, error) {
+	session, err := store.Get(r, "mdpages_session")
+	if err != nil {
+		return nil, err
+	}
+	return session.Values[key], nil
+}
+
+func Set(r *http.Request, w http.ResponseWriter, key string, value interface{}) error {
+	session, err := store.Get(r, "mdpages_session")
 	if err != nil {
 		return err
 	}
@@ -30,60 +40,33 @@ func SetKey(r *http.Request, w http.ResponseWriter, key string, value any) error
 	return session.Save(r, w)
 }
 
-func GetInfo(r *http.Request) (*types.SessionInfo, error) {
-	session, err := store.Get(r, "user_store")
-	if err != nil {
-		return nil, err
-	}
-	userval := session.Values["account"]
-	if userval == nil {
-		session.Values["account"] = nil
-		return nil, errors.New("user is not logged in")
-	}
-	var info types.SessionInfo
-	err = json.Unmarshal([]byte(userval.(string)), &info)
-	return &info, err
-}
-
-func SetInfo(w http.ResponseWriter, r *http.Request, account *types.Account) error {
-	session, err := store.Get(r, "user_store")
+func Delete(r *http.Request, w http.ResponseWriter, key string) error {
+	session, err := store.Get(r, "mdpages_session")
 	if err != nil {
 		return err
 	}
-	if account == nil {
-		session.Values["account"] = nil
-		return session.Save(r, w)
-	}
-
-	sessionInfo := types.SessionInfo{
-		Username:  account.Username,
-		Groups:    account.Groups,
-		Timestamp: time.Now().UnixNano(),
-		LoggedIn:  true,
-	}
-	acc, err := json.Marshal(sessionInfo)
-	if err != nil {
-		return err
-	}
-	session.Values["account"] = string(acc)
+	delete(session.Values, key)
 	return session.Save(r, w)
 }
 
-func SetDefault(w http.ResponseWriter, r *http.Request) error {
-	session, err := store.Get(r, "user_store")
+func EndSession(r *http.Request, w http.ResponseWriter) error {
+	return Delete(r, w, "account")
+}
+
+func StartSession(r *http.Request, w http.ResponseWriter, account types.Account) error {
+	return Set(r, w, "account", types.Session{
+		Username: account.Username,
+		Groups:   account.Groups,
+	})
+}
+
+func GetSession(r *http.Request) (*types.Session, error) {
+	session, err := store.Get(r, "mdpages_session")
 	if err != nil {
-		return err
+		return nil, err
 	}
-	s := types.SessionInfo{
-		Username:  "",
-		Groups:    []types.Group{},
-		Timestamp: 0,
-		LoggedIn:  false,
+	if value, ok := session.Values["account"].(types.Session); ok {
+		return &value, nil
 	}
-	acc, err := json.Marshal(s)
-	if err != nil {
-		return err
-	}
-	session.Values["account"] = acc
-	return nil
+	return nil, errors.New("user is not logged in")
 }

@@ -8,6 +8,6 @@ func NewErrNotFound(msg string) error {
 	return &ErrNotFound{msg: msg}
 }
 
-func (e *ErrNotFound) Error() string {
+func (e ErrNotFound) Error() string {
 	return e.msg
 }

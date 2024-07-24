@@ -49,7 +49,16 @@ func (a *accountService) Delete(ctx context.Context, username string) error {
 }
 
 func (a *accountService) GetByUsername(ctx context.Context, username string) (*types.Account, error) {
-	return a.accountRepo.GetByUsername(ctx, username)
+	acc, err := a.accountRepo.GetByUsername(ctx, username)
+	if err != nil {
+		return nil, err
+	}
+	groups, err := a.groupService.GetUserGroups(ctx, username)
+	if err != nil {
+		return nil, err
+	}
+	acc.Groups = groups
+	return acc, nil
 }
 
 func (a *accountService) GetByCredentials(ctx context.Context, username, password string) (*types.Account, error) {
@@ -57,7 +66,7 @@ func (a *accountService) GetByCredentials(ctx context.Context, username, passwor
 	if err != nil {
 		return nil, fmt.Errorf("user doesn't exist")
 	}
-	if util.CheckPasswordHash(password+acc.Salt, acc.Password) {
+	if !util.CheckPasswordHash(password+acc.Salt, acc.Password) { // this slows everything
 		return nil, fmt.Errorf("user doesn't exist")
 	}
 	return acc, nil
@@ -65,6 +74,13 @@ func (a *accountService) GetByCredentials(ctx context.Context, username, passwor
 
 // Create implements AccountService.
 func (a *accountService) Create(ctx context.Context, dto types.AccountCreateDto) error {
+	if err := dto.Validate(); err != nil {
+		return err
+	}
+
+	if _, err := a.accountRepo.GetByUsername(ctx, dto.Username); err == nil {
+		return errors.New("username is already taken")
+	}
 	salt := uuid.NewString()
 	hashedPassword, err := util.HashPassword(dto.Password + salt)
 	if err != nil {

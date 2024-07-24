@@ -157,7 +157,7 @@ func (a *articleRepo) GetAll(ctx context.Context) ([]types.Article, error) {
 			comm.title AS title, 
 			comm.created AS last_updated
 		FROM articles a 
-		INNER JOIN categories categ ON categ.id = a.category_id
+		LEFT JOIN categories categ ON categ.id = a.category_id
 		INNER JOIN commits comm ON comm.id = (
 			SELECT id FROM commits WHERE article_id = a.id ORDER BY created DESC LIMIT 1
 		)  

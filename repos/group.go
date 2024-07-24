@@ -26,6 +26,12 @@ func NewGroupRepo(db *sql.DB) GroupRepo {
 	return &groupRepo{db: db}
 }
 
+// SELECT username, password, salt, created, ARRAY(
+//     SELECT g.id FROM groups g
+//     INNER JOIN accounts_groups ag
+//     ON ag.group_id=g.id AND ag.account_id='root'
+// ) AS groups FROM accounts WHERE username = 'root';
+
 func (g *groupRepo) GetUserGroups(ctx context.Context, username string) ([]types.Group, error) {
 	q := `
 		SELECT g.id, g.name FROM groups g 

@@ -4,14 +4,14 @@ import (
     "github.com/yosa12978/mdpages/types"
 )
 
-templ Hello(name string) {
-    @Base("hello page") {
+templ Hello(name string, data types.TemplData) {
+    @Base(data) {
         <p>Hello {name}</p>
     }
 } 
 
-templ Index(title string) {
-	@Base(title) {
+templ Index(data types.TemplData) {
+	@Base(data) {
         <div hx-get="/htmx/home" hx-trigger="load" hx-swap="outerHTML">
         </div>
 	}

@@ -1,93 +1,47 @@
 package view
 
-templ Base(title string) {
+import (
+    "github.com/yosa12978/mdpages/types"
+)
+
+templ Base(data types.TemplData) {
     <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{title}</title>
-        <script src="/assets/js/htmx.min.js" integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/" crossorigin="anonymous"></script>
+        <title>{data.Title}</title>
+        <script src="https://unpkg.com/htmx.org@2.0.1"></script>
+        <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/json-enc.js"></script>
         <link href="/assets/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
         <script src="/assets/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="/assets/css/style.css">
     </head>
     <body class="p-1">
-        <style>
-            @import "https://www.nerdfonts.com/assets/css/webfont.css";
-            @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
-
-            body {
-                background-color: #FFFFFF;
-            }
-            hr {
-                border: 2px solid #121212;
-                opacity: 1;
-            }
-            .btn {
-                border-radius: 0px;
-                font-weight: 700;
-            }
-            * {
-                font-family: "Rubik", sans-serif;
-                font-optical-sizing: auto;
-                font-weight: 400;
-                font-style: normal;
-            }
-            .btn-outline-dark {
-                border: 3px solid;
-            }
-            .alert {
-                border-radius: 0px;
-                color: black;
-
-            }
-            .toc {
-                max-width: 400px;
-                width: auto;
-            }
-            .card {
-                border-radius: 0px;
-                border: 3px solid;
-            }
-            a {
-                color: black;
-            }
-            .form-control {
-                border: 3px solid;
-                border-radius: 0px;
-                font-weight: 500;
-                
-            }
-            .form-control:focus {
-                border-color: rgb(136, 136, 136);
-                box-shadow: none;
-            }
-            label {
-                font-weight: 500;
-            }
-            span {
-                font-weight: 500;
-            }
-        </style>
         <div class="container border border-4 border-dark d-flex flex-column" style="min-height: 99vh;">
-
-        <div class="header navbar border-bottom border-4 border-dark mb-3">
-            <div class="float-start">
-                <a class="text-decoration-none text-dark" href="/"><h2>*mdpages</h2></a>      
+            <div class="header navbar border-bottom border-4 border-dark mb-3">
+                <div class="float-start">
+                    <a class="text-decoration-none text-dark" href="/"><h2>*mdpages</h2></a>      
+                </div>
+                <div class="float-end">
+                    <a class="btn btn-outline-dark m-1" href="/">Home</a>
+                    <a class="btn btn-outline-dark m-1" href="/posts">Posts</a>
+                    if data.User == nil {
+                    <a class="btn btn-outline-dark m-1" href="/login">Login</a>
+                    <a class="btn btn-outline-dark m-1" href="/signup">Signup</a>
+                    } else {
+                    <a class="btn btn-outline-dark m-1" href="/account">Account</a>
+                    <button class="btn btn-outline-dark m-1" hx-post="/htmx/logout">Logout</button>
+                    }
+                </div>
             </div>
-            <div class="float-end">
-                <a class="btn btn-outline-dark m-1" href="/">Home</a>
-                <a class="btn btn-outline-dark m-1" href="/login">Login</a>
-                <a class="btn btn-outline-dark m-1" href="/signup">Signup</a>
+        
+            <div class="m-md-5">
+            { children... }
             </div>
+ 
+            <div class="footer p-2 border-top border-4 border-dark mt-auto">mdpages - <a href="/privacy">Privacy</a></div>
         </div>
-    
-        <div class="m-md-5">
-        { children... }
-        </div>
-
-        <div class="footer p-2 border-top border-4 border-dark mt-auto">mdpages - <a href="/privacy">Privacy</a></div>
-    </div>
-</body>
-</html>
+    </body>
+    </html>
 }

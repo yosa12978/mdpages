@@ -1,14 +1,17 @@
 package view
 
-templ Login() {
-    @Base("mdpages - Login"){
-        <h1>Login</h1>
-        <form action="POST" style="max-width:500px;">
-            <label class="mt-2">Username</label>
-            <input type="text" name="username" class="form-control" placeholder="username"/>
-            <label class="mt-2">Password</label>
-            <input type="password" name="password" class="form-control" placeholder="password"/>
-            <button type="submit" class="btn btn-outline-dark mt-2" >Login</button>
+import "github.com/yosa12978/mdpages/types"
+
+templ Login(data types.TemplData) {
+    @Base(data){
+        <h1 class="mb-2">Login</h1>
+        <form hx-post="/htmx/login" hx-target="#red-box" hx-swap="innerHTML" hx-ext="json-enc" style="max-width:500px;">
+            <div id="red-box" class="alert alert-danger border border-4 border-danger"></div>
+            <label>Username</label>
+            <input type="text" name="username" class="form-control mb-2" placeholder="username"/>
+            <label>Password</label>
+            <input type="password" name="password" class="form-control mb-2" placeholder="password"/>
+            <button type="submit" class="btn btn-outline-dark">Login</button>
         </form>
     }
 }

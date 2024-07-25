@@ -12,6 +12,8 @@ type ArticleRepo interface {
 	GetByCategoryId(ctx context.Context, categoryId string) ([]types.Article, error)
 	GetById(ctx context.Context, id string) (*types.Article, error)
 	GetAll(ctx context.Context) ([]types.Article, error)
+	GetUncategorized(ctx context.Context) ([]types.Article, error)
+
 	Create(ctx context.Context, entity types.Article) error
 	Update(ctx context.Context, id string, entity types.Article) error
 	Delete(ctx context.Context, id string) error
@@ -30,6 +32,41 @@ func NewArticleRepo(db *sql.DB) ArticleRepo {
 	return &articleRepo{
 		db: db,
 	}
+}
+
+func (a *articleRepo) GetUncategorized(ctx context.Context) ([]types.Article, error) {
+	q := `
+		SELECT
+			a.id AS article_id, 
+			comm.id AS commit_id, 
+			comm.title AS title, 
+			comm.created AS last_updated
+		FROM articles a 
+		INNER JOIN commits comm ON comm.id = (
+			SELECT id FROM commits WHERE article_id = a.id ORDER BY created DESC LIMIT 1
+		)
+		WHERE category_id is NULL
+		ORDER BY title;
+	`
+	rows, err := a.db.QueryContext(ctx, q)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return []types.Article{}, types.NewErrNotFound("articles not found")
+		}
+		return nil, err
+	}
+	articles := []types.Article{}
+	for rows.Next() {
+		article := types.Article{}
+		rows.Scan(
+			&article.Id,
+			&article.CommitId,
+			&article.Title,
+			&article.CommitCreated,
+		)
+		articles = append(articles, article)
+	}
+	return articles, nil
 }
 
 func (g *articleRepo) AddRGroup(ctx context.Context, article_id, group_id string) error {

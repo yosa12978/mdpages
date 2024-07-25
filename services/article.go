@@ -12,9 +12,11 @@ import (
 )
 
 type ArticleService interface {
+	GetAll(ctx context.Context) ([]types.Article, error)
 	GetById(ctx context.Context, id string) (*types.Article, error)
 	GetHomePage(ctx context.Context) (*types.Article, error)
 	GetByCategoryId(ctx context.Context, categoryId string) []types.Article
+	GetUncategorized(ctx context.Context) []types.Article
 
 	Create(ctx context.Context, dto types.ArticleCreateDto) error
 	Delete(ctx context.Context, id string) error
@@ -38,6 +40,15 @@ func NewArticleService(
 		articleRepo: articleRepo,
 		logger:      logger,
 	}
+}
+
+func (a *articleService) GetUncategorized(ctx context.Context) []types.Article {
+	articles, _ := a.articleRepo.GetUncategorized(ctx)
+	return articles
+}
+
+func (a *articleService) GetAll(ctx context.Context) ([]types.Article, error) {
+	return a.articleRepo.GetAll(ctx)
 }
 
 func (a *articleService) AddRGroup(ctx context.Context, article_id, group_id string) error {

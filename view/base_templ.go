@@ -43,7 +43,7 @@ func Base(data types.TemplData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><script src=\"https://unpkg.com/htmx.org@2.0.1\"></script><script src=\"https://unpkg.com/htmx.org@1.9.12/dist/ext/json-enc.js\"></script><link href=\"/assets/css/bootstrap.min.css\" rel=\"stylesheet\" integrity=\"sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH\" crossorigin=\"anonymous\"><script src=\"/assets/js/bootstrap.bundle.min.js\" integrity=\"sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz\" crossorigin=\"anonymous\"></script><link rel=\"stylesheet\" href=\"/assets/css/style.css\"></head><body class=\"p-1\"><div class=\"container border border-4 border-dark d-flex flex-column\" style=\"min-height: 99vh;\"><div class=\"header navbar border-bottom border-4 border-dark mb-3\"><div class=\"float-start\"><a class=\"text-decoration-none text-dark\" href=\"/\"><h2>*mdpages</h2></a></div><div class=\"float-end\"><a class=\"btn btn-outline-dark m-1\" href=\"/\">Home</a> <a class=\"btn btn-outline-dark m-1\" href=\"/posts\">Posts</a> ")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><script src=\"/assets/js/marked.min.js\"></script><script src=\"/assets/js/htmx.min.js\"></script><script src=\"/assets/js/json-enc.js\"></script><link href=\"/assets/css/bootstrap.min.css\" rel=\"stylesheet\" integrity=\"sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH\" crossorigin=\"anonymous\"><script src=\"/assets/js/bootstrap.bundle.min.js\" integrity=\"sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz\" crossorigin=\"anonymous\"></script><link rel=\"stylesheet\" href=\"/assets/css/style.css\"></head><body class=\"p-1\"><div class=\"container border border-4 border-dark d-flex flex-column\" style=\"min-height: 99vh;\"><div class=\"header navbar border-bottom border-4 border-dark mb-3\"><div class=\"float-start\"><a class=\"text-decoration-none text-dark\" href=\"/\"><h2>*mdpages</h2></a></div><div class=\"float-end\"><a class=\"btn btn-outline-dark m-1\" href=\"/\">Home</a> <a class=\"btn btn-outline-dark m-1\" href=\"/pages\">Pages</a> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -58,7 +58,7 @@ func Base(data types.TemplData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div><div class=\"m-md-5\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div><div class=\"mx-md-5 my-3 my-md-5\" style=\"max-width: 55rem;\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

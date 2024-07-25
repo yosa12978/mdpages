@@ -5,12 +5,14 @@ import (
 	"net/http"
 
 	"github.com/yosa12978/mdpages/logging"
+	"github.com/yosa12978/mdpages/middleware"
 	"github.com/yosa12978/mdpages/services"
 	"github.com/yosa12978/mdpages/session"
 	"github.com/yosa12978/mdpages/types"
 )
 
 type AuthHandler interface {
+	Setup(router *http.ServeMux)
 	Login() Handler
 	Signup() Handler
 	Logout() Handler
@@ -29,6 +31,28 @@ func NewAuthHandler(
 		accountService: accountService,
 		logger:         logger,
 	}
+}
+
+func (a *authHandler) Setup(router *http.ServeMux) {
+	router.HandleFunc("POST /htmx/login",
+		middleware.AnonymousOnly(
+			MakeHandler(
+				a.Login(),
+			),
+		),
+	)
+	router.HandleFunc("POST /htmx/signup",
+		middleware.AnonymousOnly(
+			MakeHandler(
+				a.Signup(),
+			),
+		),
+	)
+	router.HandleFunc("POST /htmx/logout",
+		MakeHandler(
+			a.Logout(),
+		),
+	)
 }
 
 func (h *authHandler) Logout() Handler {

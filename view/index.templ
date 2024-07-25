@@ -17,14 +17,6 @@ templ Index(data types.TemplData) {
 	}
 }
 
-templ Page(article types.Article) {
-    <div class="mb-3" id="article">
-        <h1>{article.Title}</h1>
-        <a href={ templ.URL("/commits/"+article.Id) }>Commit History</a><br><br>
-        <span>{article.Body}</span>
-    </div>
-}
-
 templ Alert(content string) {
-	<div class="alert alert-warning m-md-5 border border-4 border-warning">{ content }</div>
+	<div class="alert alert-warning border border-4 border-warning">{ content }</div>
 }

@@ -50,6 +50,18 @@ func NewRouter(ctx context.Context) http.Handler {
 		logger.Error(err.Error())
 	}
 
+	SetupRoutes(router)
+
+	authHandler := handler.NewAuthHandler(accountService, logger)
+	authHandler.Setup(router)
+
+	articleHandler := handler.NewArticleHandler(articleService, logger)
+	articleHandler.Setup(router)
+
+	return router
+}
+
+func SetupRoutes(router *http.ServeMux) {
 	router.Handle("/assets/", http.StripPrefix("/assets", http.FileServer(http.Dir("assets"))))
 
 	router.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +69,7 @@ func NewRouter(ctx context.Context) http.Handler {
 		view.Index(types.TemplData{
 			Title: "Home",
 			User:  usr,
-		}).Render(ctx, w)
+		}).Render(r.Context(), w)
 	})
 
 	router.HandleFunc("GET /login", middleware.AnonymousOnly(
@@ -70,7 +82,7 @@ func NewRouter(ctx context.Context) http.Handler {
 			view.Login(types.TemplData{
 				Title: "Login",
 				User:  usr,
-			}).Render(ctx, w)
+			}).Render(r.Context(), w)
 		}))
 
 	router.HandleFunc("GET /signup", middleware.AnonymousOnly(
@@ -83,7 +95,7 @@ func NewRouter(ctx context.Context) http.Handler {
 			view.Signup(types.TemplData{
 				Title: "Signup",
 				User:  usr,
-			}).Render(ctx, w)
+			}).Render(r.Context(), w)
 		}))
 
 	router.HandleFunc("GET /hello", func(w http.ResponseWriter, r *http.Request) {
@@ -95,42 +107,22 @@ func NewRouter(ctx context.Context) http.Handler {
 		view.Hello(usr.Username, types.TemplData{
 			Title: "Hello Page",
 			User:  usr,
-		}).Render(ctx, w)
+		}).Render(r.Context(), w)
 	})
 
-	router.HandleFunc("GET /htmx/home", func(w http.ResponseWriter, r *http.Request) {
-		article, err := articleService.GetHomePage(r.Context())
-		if err != nil {
-			logger.Error(err.Error())
-			http.Error(w, err.Error(), 500)
-			return
-		}
-		view.Page(*article).Render(ctx, w)
+	router.HandleFunc("GET /pages", func(w http.ResponseWriter, r *http.Request) {
+		usr, _ := session.GetSession(r)
+		view.PagesPage(types.TemplData{
+			Title: "Pages",
+			User:  usr,
+		}).Render(r.Context(), w)
 	})
 
-	// place to another spot
-	authHandler := handler.NewAuthHandler(accountService, logger)
-	router.HandleFunc("POST /htmx/login",
-		middleware.AnonymousOnly(
-			handler.MakeHandler(
-				authHandler.Login(),
-			),
-		),
-	)
-	router.HandleFunc("POST /htmx/signup",
-		middleware.AnonymousOnly(
-			handler.MakeHandler(
-				authHandler.Signup(),
-			),
-		),
-	)
-	router.HandleFunc("POST /htmx/logout", handler.MakeHandler(authHandler.Logout()))
-
-	// make a middleware for groups and etc i.e. only for anon users
-
-	return router
-}
-
-func SetupRouter() {
-
+	router.HandleFunc("GET /pages/{id}", func(w http.ResponseWriter, r *http.Request) {
+		usr, _ := session.GetSession(r)
+		view.PagesPage(types.TemplData{
+			Title: "Page",
+			User:  usr,
+		}).Render(r.Context(), w)
+	})
 }

@@ -20,6 +20,7 @@ require (
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/redis/go-redis v6.15.9+incompatible // indirect
+	github.com/yuin/goldmark v1.7.4 // indirect
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/text v0.16.0 // indirect

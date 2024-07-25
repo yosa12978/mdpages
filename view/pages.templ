@@ -1,0 +1,53 @@
+package view
+
+import (
+    "context"
+    "io"
+    "github.com/yosa12978/mdpages/types"
+    "github.com/yuin/goldmark"
+    "bytes"
+)
+
+func Unsafe(md string) templ.Component {
+    var buf bytes.Buffer
+	goldmark.Convert([]byte(md), &buf)
+	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
+		_, err = io.WriteString(w, buf.String())
+		return
+	})
+}
+
+templ Page(article types.Article) {
+    <div class="mb-3" id="article">
+        <h1>{article.Title}</h1>
+        <a class="badge bg-warning text-dark text-decoration-none" href={ templ.URL("/commits/"+article.Id) }>Commit History</a> |
+        <a class="badge bg-warning text-dark text-decoration-none" href={ templ.URL("/commits/create/"+article.Id) }>Create Commit</a>
+        <hr>
+        <span id="body-text">@Unsafe(article.Body)</span>
+    </div>
+}
+
+templ Pages(articles []types.Article) {
+    <h3>Posts</h3>
+    <ul>
+    for _, article := range articles {
+    <li><a href={ templ.URL("/pages/"+article.Id) }>{article.Title}</a></li>
+    }
+    </ul>
+}
+
+templ Categories(categories []types.Category) {
+    <h3>Categories</h3>
+    <ul>
+    for _, category := range categories {
+    <li><a href={ templ.URL("/categories/"+category.Id) }>{category.Name}</a></li>
+    }
+    </ul>
+}
+
+templ PagesPage(data types.TemplData) {
+    @Base(data){
+    <div hx-get="/htmx/categories" hx-swap="innerHTML" hx-trigger="load"></div>
+    <div hx-get="/htmx/pages" hx-swap="innerHTML" hx-trigger="load"></div>
+    }
+}

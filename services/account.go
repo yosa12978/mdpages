@@ -64,10 +64,10 @@ func (a *accountService) GetByUsername(ctx context.Context, username string) (*t
 func (a *accountService) GetByCredentials(ctx context.Context, username, password string) (*types.Account, error) {
 	acc, err := a.GetByUsername(ctx, username)
 	if err != nil {
-		return nil, fmt.Errorf("user doesn't exist")
+		return nil, fmt.Errorf("username or password is wrong")
 	}
 	if !util.CheckPasswordHash(password+acc.Salt, acc.Password) { // this slows everything
-		return nil, fmt.Errorf("user doesn't exist")
+		return nil, fmt.Errorf("username or password is wrong")
 	}
 	return acc, nil
 }

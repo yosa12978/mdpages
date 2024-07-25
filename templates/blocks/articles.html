@@ -3,10 +3,13 @@
     <h1>{{.Title}}</h1>
     <a class="badge bg-warning text-dark text-decoration-none" href="/commits/{{.Id}}">Commit History</a> |
     <a class="badge bg-warning text-dark text-decoration-none" href="/commits/create/{{.Id}}">Create Commit</a>
+    <span class="float-end" id="last_update">{{.CommitCreated}}</span>
+
     <hr />
     <span id="content"></span>
     <script>
         renderMarkdown("content", "{{.Body}}");
+        document.getElementById("last_update").innerHTML = "Last updated: " + getDate("{{.CommitCreated}}");
     </script>
 </div>
 {{end}}

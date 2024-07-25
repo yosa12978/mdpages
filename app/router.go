@@ -57,6 +57,9 @@ func NewRouter(ctx context.Context) http.Handler {
 	articleHandler := handler.NewArticleHandler(articleService, logger)
 	articleHandler.Setup(router)
 
+	categoryHandler := handler.NewCategoryHandler(categoryService, articleService)
+	categoryHandler.Setup(router)
+
 	return router
 }
 
@@ -91,6 +94,7 @@ func SetupRoutes(router *http.ServeMux) {
 	})
 
 	router.HandleFunc("GET /pages/{id}", func(w http.ResponseWriter, r *http.Request) {
-		util.RenderView(w, r, "detail", r.PathValue("id"))
+		id := r.PathValue("id")
+		util.RenderView(w, r, "detail", id)
 	})
 }

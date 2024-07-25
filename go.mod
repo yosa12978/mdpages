@@ -3,7 +3,7 @@ module github.com/yosa12978/mdpages
 go 1.22.4
 
 require (
-	github.com/a-h/templ v0.2.747
+	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/sessions v1.3.0
 	github.com/joho/godotenv v1.5.1
@@ -12,16 +12,8 @@ require (
 )
 
 require (
-	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
-	github.com/go-playground/locales v0.14.1 // indirect
-	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.22.0 // indirect
-	github.com/go-redis/redis v6.15.9+incompatible // indirect
+	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
-	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/redis/go-redis v6.15.9+incompatible // indirect
-	github.com/yuin/goldmark v1.7.4 // indirect
-	golang.org/x/net v0.24.0 // indirect
-	golang.org/x/sys v0.21.0 // indirect
-	golang.org/x/text v0.16.0 // indirect
+	github.com/onsi/ginkgo v1.16.5 // indirect
+	github.com/onsi/gomega v1.33.1 // indirect
 )

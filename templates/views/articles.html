@@ -1,0 +1,4 @@
+{{template "top" .}}
+<div hx-get="/htmx/categories" hx-swap="innerHTML" hx-trigger="load"></div>
+<div hx-get="/htmx/pages" hx-swap="innerHTML" hx-trigger="load"></div>
+{{template "bottom" .}}

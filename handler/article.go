@@ -5,7 +5,7 @@ import (
 
 	"github.com/yosa12978/mdpages/logging"
 	"github.com/yosa12978/mdpages/services"
-	"github.com/yosa12978/mdpages/view"
+	"github.com/yosa12978/mdpages/util"
 )
 
 type ArticleHandler interface {
@@ -48,21 +48,17 @@ func (a *articleHandler) GetHomePage() Handler {
 		if err != nil {
 			return err
 		}
-		view.Page(*article).Render(r.Context(), w)
-		return err
+		return util.RenderBlock(w, "article", article)
 	}
 }
 
-// GetArticles implements ArticleHandler.
 func (a *articleHandler) GetArticles() Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		articles := a.articleService.GetUncategorized(r.Context())
-		view.Pages(articles).Render(r.Context(), w)
-		return nil
+		return util.RenderBlock(w, "articles", articles)
 	}
 }
 
-// GetArticlesById implements ArticleHandler.
 func (a *articleHandler) GetArticleById() Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		id := r.PathValue("id")
@@ -70,7 +66,6 @@ func (a *articleHandler) GetArticleById() Handler {
 		if err != nil {
 			return err
 		}
-		view.Page(*article).Render(r.Context(), w)
-		return nil
+		return util.RenderBlock(w, "article", article)
 	}
 }

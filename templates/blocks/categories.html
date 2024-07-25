@@ -1,0 +1,8 @@
+{{block "categories" . }}
+<h3>Categories</h3>
+<ul>
+    {{range .Payload}}
+    <li><a href="/categories/{{.Id}}">{{.Name}}</a></li>
+    {{end}}
+</ul>
+{{end}}

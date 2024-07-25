@@ -54,7 +54,8 @@ type Session struct {
 	Groups   []Group `json:"groups"`
 }
 
-type TemplData struct {
-	User  *Session
-	Title string
+type Templ struct {
+	User    *Session
+	Title   string
+	Payload any
 }

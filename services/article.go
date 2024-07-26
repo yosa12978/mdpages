@@ -63,12 +63,17 @@ func (a *articleService) AddWGroup(ctx context.Context, article_id, group_id str
 }
 
 func (a *articleService) createHomePage(ctx context.Context) (*types.Article, error) {
+	body := `
+This is default home page layout. You can change it by adding a new commit
+
+<img src="/assets/images/welcome.webp" class="center" alt="Welcome!"/>
+	`
 	article := types.Article{
 		Id:            "home",
 		CategoryId:    "",
 		CategoryName:  "",
 		Title:         "Home",
-		Body:          "This is default home page layout. You can change it by adding a new commit",
+		Body:          body,
 		CommitCreated: time.Now().Format(time.RFC3339),
 		CommitId:      uuid.NewString(),
 		CommitAuthor:  "root",

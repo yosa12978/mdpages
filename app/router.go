@@ -64,9 +64,14 @@ func NewRouter(ctx context.Context) http.Handler {
 }
 
 func SetupRoutes(router *http.ServeMux) {
-	router.Handle("/assets/", http.StripPrefix("/assets", http.FileServer(http.Dir("assets"))))
+	router.Handle("GET /assets/", http.StripPrefix("/assets", http.FileServer(http.Dir("assets"))))
 
-	router.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			w.WriteHeader(http.StatusNotFound)
+			util.RenderView(w, r, "notfound", nil)
+			return
+		}
 		util.RenderView(w, r, "home", nil)
 	})
 
@@ -96,5 +101,9 @@ func SetupRoutes(router *http.ServeMux) {
 	router.HandleFunc("GET /pages/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id := r.PathValue("id")
 		util.RenderView(w, r, "detail", id)
+	})
+
+	router.HandleFunc("GET /categories/{id}", func(w http.ResponseWriter, r *http.Request) {
+		util.RenderView(w, r, "articles", r.PathValue("id"))
 	})
 }

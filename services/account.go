@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -19,6 +20,7 @@ type AccountService interface {
 
 	Create(ctx context.Context, dto types.AccountCreateDto) error
 	Delete(ctx context.Context, username string) error
+	ChangePassword(ctx context.Context, oldPassword, newPassword string) error
 
 	Seed(ctx context.Context, rootPassword string) error
 }
@@ -96,11 +98,44 @@ func (a *accountService) Create(ctx context.Context, dto types.AccountCreateDto)
 
 // Seed implements AccountService.
 func (a *accountService) Seed(ctx context.Context, rootPassword string) error {
-	if err := a.Create(ctx, types.AccountCreateDto{
-		Username: "root",
-		Password: rootPassword,
-	}); err != nil {
-		a.logger.Error(err.Error())
+	// refactor this whole thing
+	// it looks terrible
+
+	usr, err := a.GetByUsername(ctx, "root")
+	if err != nil {
+		if _, ok := err.(types.ErrNotFound); ok {
+			if err := a.Create(ctx, types.AccountCreateDto{
+				Username: "root",
+				Password: rootPassword,
+			}); err != nil {
+				a.logger.Error(err.Error())
+				return err
+			}
+		} else {
+			a.logger.Error(err.Error())
+			return err
+		}
+	}
+	if usr != nil {
+		if !util.CheckPasswordHash(rootPassword+usr.Salt, usr.Password) {
+			a.ChangePassword(ctx, "root", rootPassword)
+		}
 	}
 	return a.groupService.AddUser(ctx, "root", "root")
+}
+
+// add check for old password
+func (a *accountService) ChangePassword(ctx context.Context, username, newPassword string) error {
+	if strings.Contains(newPassword, " ") {
+		return errors.New("password can't contain spaces")
+	}
+	if len(newPassword) < 4 {
+		return errors.New("length of your password can't be less then 4 characters")
+	}
+	salt := uuid.NewString()
+	passwordHash, _ := util.HashPassword(newPassword + salt)
+	return a.accountRepo.Update(ctx, username, types.Account{
+		Password: passwordHash,
+		Salt:     salt,
+	})
 }

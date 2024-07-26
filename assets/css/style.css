@@ -48,7 +48,7 @@ hr {
 .form-control {
     border: 3px solid;
     border-radius: 0px;
-    font-weight: 500;    
+    font-weight: 500;
 }
 
 .form-control:focus {
@@ -66,4 +66,23 @@ span {
 
 #red-box:empty {
     display: none;
+}
+
+img {
+    width: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+iframe {
+    max-height: 500px;
+    max-width: 100%;
+    object-fit: contain;
 }

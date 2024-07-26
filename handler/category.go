@@ -30,8 +30,10 @@ func NewCategoryHandler(
 
 func (c *categoryHandler) Setup(router *http.ServeMux) {
 	router.HandleFunc("GET /htmx/categories", MakeHandler(c.GetRootCategories()))
+	router.HandleFunc("GET /htmx/categories/{parentId}", MakeHandler(c.GetSubcategories()))
 }
 
+// merge these two methods by using sql.NullValue or smth in repository
 func (c *categoryHandler) GetRootCategories() Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		categories := c.categoryService.GetRoots(r.Context())
@@ -44,6 +46,11 @@ func (c *categoryHandler) GetRootCategories() Handler {
 
 func (c *categoryHandler) GetSubcategories() Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		return nil
+		parentId := r.PathValue("parentId")
+		categories := c.categoryService.GetSubcategories(r.Context(), parentId)
+		if len(categories) == 0 {
+			return nil
+		}
+		return util.RenderBlock(w, "categories", categories)
 	}
 }

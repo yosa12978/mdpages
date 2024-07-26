@@ -34,7 +34,10 @@ func (a *articleHandler) Setup(router *http.ServeMux) {
 	router.HandleFunc("/htmx/pages",
 		MakeHandler(a.GetArticles()),
 	)
-	router.HandleFunc("/htmx/pages/{id}",
+	router.HandleFunc("/htmx/pages/{category_id}",
+		MakeHandler(a.GetArticleById()),
+	)
+	router.HandleFunc("/htmx/article/{id}",
 		MakeHandler(a.GetArticleById()),
 	)
 	router.HandleFunc("GET /htmx/home",
@@ -67,5 +70,13 @@ func (a *articleHandler) GetArticleById() Handler {
 			return err
 		}
 		return util.RenderBlock(w, "article", article)
+	}
+}
+
+func (a *articleHandler) GetArticlesByCategoryId() Handler {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		category_id := r.PathValue("category_id")
+		articles := a.articleService.GetByCategoryId(r.Context(), category_id)
+		return util.RenderBlock(w, "articles", articles)
 	}
 }

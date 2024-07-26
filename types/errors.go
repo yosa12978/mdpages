@@ -5,7 +5,7 @@ type ErrNotFound struct {
 }
 
 func NewErrNotFound(msg string) error {
-	return &ErrNotFound{msg: msg}
+	return ErrNotFound{msg: msg}
 }
 
 func (e ErrNotFound) Error() string {

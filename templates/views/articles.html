@@ -1,4 +1,9 @@
 {{template "top" .}}
+{{if .Payload}}
+<div hx-get="/htmx/categories/{{.Payload}}" hx-swap="innerHTML" hx-trigger="load"></div>
+<div hx-get="/htmx/pages/{{.Payload}}" hx-swap="innerHTML" hx-trigger="load"></div>
+{{else}}
 <div hx-get="/htmx/categories" hx-swap="innerHTML" hx-trigger="load"></div>
 <div hx-get="/htmx/pages" hx-swap="innerHTML" hx-trigger="load"></div>
+{{end}}
 {{template "bottom" .}}

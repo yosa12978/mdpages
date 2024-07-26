@@ -1,12 +1,12 @@
 {{ block "article" . }}
 <div class="mb-3" id="article">
     <h1>{{.Title}}</h1>
-    <a class="badge bg-warning text-dark text-decoration-none" href="/commits/{{.Id}}">Commit History</a> |
+    <a class="badge bg-warning text-dark text-decoration-none" href="/commits/{{.Id}}">Commit History</a>
     <a class="badge bg-warning text-dark text-decoration-none" href="/commits/create/{{.Id}}">Create Commit</a>
-    <span class="float-end" id="last_update">{{.CommitCreated}}</span>
+    <span class="badge bg-primary" id="last_update">{{.CommitCreated}}</span>
 
     <hr />
-    <span id="content"></span>
+    <span id="content">{{.Body}}</span>
     <script>
         renderMarkdown("content", "{{.Body}}");
         document.getElementById("last_update").innerHTML = "Last updated: " + getDate("{{.CommitCreated}}");
@@ -16,10 +16,10 @@
 
 
 {{ block "articles" . }}
-<h3>Posts</h3>
+<h3>Pages</h3>
 <ul>
     {{ range . }}
-    <li><a href="/pages/{{.Id}}">{{.Title}}</a></li>
+    <li><a href="/article/{{.Id}}">{{.Title}}</a></li>
     {{end}}
 </ul>
 {{end}}

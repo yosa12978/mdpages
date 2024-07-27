@@ -1,7 +1,12 @@
 {{block "categories" . }}
+{{if .Parent}}
+<a href="/categories/{{.Parent.ParentId}}" class="badge bg-warning text-decoration-none text-dark mb-3">Go Back</a>
+<h3>Category: {{.Parent.Name}}</h3>
+{{else}}
 <h3>Categories</h3>
+{{end}}
 <ul>
-    {{range .}}
+    {{range .Categories}}
     <li><a href="/categories/{{.Id}}">{{.Name}}</a></li>
     {{end}}
 </ul>

@@ -15,6 +15,7 @@ type CategoryService interface {
 	GetSubcategories(ctx context.Context, parentId string) []types.Category
 	GetById(ctx context.Context, id string) (*types.Category, error)
 	GetRoots(ctx context.Context) []types.Category
+	GetCategories(ctx context.Context, parentId string) []types.Category
 
 	Create(ctx context.Context, dto types.CategoryCreateDto) error
 	Update(ctx context.Context, id, name, parent_id string) error
@@ -36,6 +37,14 @@ func NewCategoryService(
 		categoryRepo: categoryRepo,
 		logger:       logger,
 	}
+}
+
+func (c *categoryService) GetCategories(ctx context.Context, parentId string) []types.Category {
+	categories, err := c.categoryRepo.GetCategories(ctx, parentId)
+	if err != nil {
+		return []types.Category{}
+	}
+	return categories
 }
 
 func (c *categoryService) GetSubcategories(ctx context.Context, parentId string) []types.Category {

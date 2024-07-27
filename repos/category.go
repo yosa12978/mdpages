@@ -16,6 +16,8 @@ type CategoryRepo interface {
 	GetById(ctx context.Context, id string) (*types.Category, error)
 	Update(ctx context.Context, id string, entity types.Category) error
 	GetByName(ctx context.Context, name string) (*types.Category, error)
+
+	GetCategories(ctx context.Context, parentId string) ([]types.Category, error)
 }
 
 type categoryRepo struct {
@@ -58,6 +60,38 @@ func (c *categoryRepo) GetSubcategories(ctx context.Context, id string) ([]types
 		category := types.Category{}
 		row.Scan(&category.Id, &category.Name)
 		category.ParentId = id
+		categories = append(categories, category)
+	}
+	return categories, nil
+}
+
+func (c *categoryRepo) GetCategories(ctx context.Context, parentId string) ([]types.Category, error) {
+	q := `
+		SELECT id, name, parent_id FROM categories WHERE parent_id = $1;
+	`
+	if parentId == "" {
+		// q = `
+		// 	SELECT id, name, parent_id FROM categories WHERE parent_id IS NULL;
+		// `
+		return c.GetRootCategories(ctx) // idk do smth with this enclosure
+	}
+	row, err := c.db.QueryContext(ctx, q, parentId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return []types.Category{}, types.NewErrNotFound("categories not found")
+		}
+		return nil, err
+	}
+	categories := []types.Category{}
+	for row.Next() {
+		category := types.Category{}
+		var parentId sql.NullString
+		row.Scan(
+			&category.Id,
+			&category.Name,
+			&parentId,
+		)
+		category.ParentId = parentId.String
 		categories = append(categories, category)
 	}
 	return categories, nil
@@ -107,11 +141,13 @@ func (c *categoryRepo) Delete(ctx context.Context, id string) error {
 
 func (c *categoryRepo) GetById(ctx context.Context, id string) (*types.Category, error) {
 	q := `
-		SELECT id, name FROM categories WHERE id=$1;
+		SELECT id, name, parent_id FROM categories WHERE id=$1;
 	`
+	var parent_id sql.NullString
 	category_row := c.db.QueryRowContext(ctx, q, id)
 	category := types.Category{}
-	err := category_row.Scan(&category.Id, &category.Name)
+	err := category_row.Scan(&category.Id, &category.Name, &parent_id)
+	category.ParentId = parent_id.String
 	if err == sql.ErrNoRows {
 		return nil, types.NewErrNotFound("category not found")
 	}

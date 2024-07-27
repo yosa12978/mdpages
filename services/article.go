@@ -66,7 +66,7 @@ func (a *articleService) createHomePage(ctx context.Context) (*types.Article, er
 	body := `
 This is default home page layout. You can change it by adding a new commit
 
-<img src="/assets/images/welcome.webp" class="center" alt="Welcome!"/>
+![Welcome](/assets/images/welcome.webp)
 	`
 	article := types.Article{
 		Id:            "home",

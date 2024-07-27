@@ -35,7 +35,7 @@ func (a *articleHandler) Setup(router *http.ServeMux) {
 		MakeHandler(a.GetArticles()),
 	)
 	router.HandleFunc("/htmx/pages/{category_id}",
-		MakeHandler(a.GetArticleById()),
+		MakeHandler(a.GetArticlesByCategoryId()),
 	)
 	router.HandleFunc("/htmx/article/{id}",
 		MakeHandler(a.GetArticleById()),

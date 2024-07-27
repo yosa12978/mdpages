@@ -9,8 +9,7 @@ import (
 
 type CategoryHandler interface {
 	Setup(router *http.ServeMux)
-	GetRootCategories() Handler
-	GetSubcategories() Handler
+	GetCategories() Handler
 }
 
 type categoryHandler struct {
@@ -28,29 +27,22 @@ func NewCategoryHandler(
 	}
 }
 
-func (c *categoryHandler) Setup(router *http.ServeMux) {
-	router.HandleFunc("GET /htmx/categories", MakeHandler(c.GetRootCategories()))
-	router.HandleFunc("GET /htmx/categories/{parentId}", MakeHandler(c.GetSubcategories()))
+func (c *categoryHandler) Setup(router *http.ServeMux) { // remake setup handler to take interface as an argument and be just a regular func not struct method
+	router.HandleFunc("GET /htmx/categories", MakeHandler(c.GetCategories()))
+	router.HandleFunc("GET /htmx/categories/{parentId}", MakeHandler(c.GetCategories()))
 }
 
-// merge these two methods by using sql.NullValue or smth in repository
-func (c *categoryHandler) GetRootCategories() Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
-		categories := c.categoryService.GetRoots(r.Context())
-		if len(categories) == 0 {
-			return nil
-		}
-		return util.RenderBlock(w, "categories", categories)
-	}
-}
-
-func (c *categoryHandler) GetSubcategories() Handler {
+func (c *categoryHandler) GetCategories() Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		parentId := r.PathValue("parentId")
-		categories := c.categoryService.GetSubcategories(r.Context(), parentId)
-		if len(categories) == 0 {
-			return nil
+		payload := make(map[string]any)
+		parent, err := c.categoryService.GetById(r.Context(), parentId)
+		if err != nil && parentId != "" {
+			return err
 		}
-		return util.RenderBlock(w, "categories", categories)
+		payload["Parent"] = parent
+		categories := c.categoryService.GetCategories(r.Context(), parentId)
+		payload["Categories"] = categories
+		return util.RenderBlock(w, "categories", payload)
 	}
 }

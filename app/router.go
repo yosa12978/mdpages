@@ -94,11 +94,11 @@ func SetupRoutes(router *http.ServeMux) {
 		util.RenderView(w, r, "hello", usr.Username)
 	})
 
-	router.HandleFunc("GET /pages", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("GET /categories/", func(w http.ResponseWriter, r *http.Request) {
 		util.RenderView(w, r, "articles", nil)
 	})
 
-	router.HandleFunc("GET /pages/{id}", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("GET /article/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id := r.PathValue("id")
 		util.RenderView(w, r, "detail", id)
 	})

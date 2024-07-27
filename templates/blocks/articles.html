@@ -16,10 +16,12 @@
 
 
 {{ block "articles" . }}
+{{if .}}
 <h3>Pages</h3>
 <ul>
     {{ range . }}
     <li><a href="/article/{{.Id}}">{{.Title}}</a></li>
     {{end}}
 </ul>
+{{end}}
 {{end}}

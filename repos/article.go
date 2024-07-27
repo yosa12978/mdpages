@@ -109,10 +109,10 @@ func (a *articleRepo) GetByCategoryId(ctx context.Context, categoryId string) ([
 			comm.id AS commit_id, 
 			comm.title AS title, 
 			comm.created AS last_updated
-		FROM articles a WHERE a.category_id = $1
+		FROM articles a 
 		INNER JOIN commits comm ON comm.id = (
 			SELECT id FROM commits WHERE article_id = a.id ORDER BY created DESC LIMIT 1
-		)  
+		) AND a.category_id = $1
 		ORDER BY title;
 	`
 	row, err := a.db.QueryContext(ctx, q, categoryId)

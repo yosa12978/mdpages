@@ -63,6 +63,9 @@ func (m *GroupCreateDto) Validate() error {
 	if len(m.Name) < 3 {
 		return errors.New("length of group name less then 3 characters")
 	}
+	if strings.Contains(m.Name, " ") {
+		return errors.New("group name can't contain spaces")
+	}
 	return nil
 }
 

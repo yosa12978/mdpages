@@ -27,7 +27,7 @@ func RootOnly(h http.HandlerFunc) http.HandlerFunc {
 		}
 		w.Header().Set("Cache-Control", "no-cache")
 		for _, v := range usr.Groups {
-			if v.Id == "root" {
+			if v.Name == "root" {
 				h(w, r)
 				return
 			}

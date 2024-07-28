@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/google/uuid"
 	"github.com/yosa12978/mdpages/logging"
 	"github.com/yosa12978/mdpages/repos"
 	"github.com/yosa12978/mdpages/types"
@@ -12,12 +11,12 @@ import (
 
 type GroupService interface {
 	GetAll(ctx context.Context) []types.Group
-	GetById(ctx context.Context, id string) (*types.Group, error)
+	GetByName(ctx context.Context, name string) (*types.Group, error)
 	AddUser(ctx context.Context, username, groupId string) error
 	RemoveUser(ctx context.Context, username, groupId string) error
 	CreateGroup(ctx context.Context, dto types.GroupCreateDto) error
-	DeleteGroup(ctx context.Context, id string) error
-	UpdateGroup(ctx context.Context, id string, group types.GroupUpdateDto) error
+	DeleteGroup(ctx context.Context, name string) error
+	UpdateGroup(ctx context.Context, name string, group types.GroupUpdateDto) error
 	GetUserGroups(ctx context.Context, username string) ([]types.Group, error)
 	Seed(ctx context.Context) error
 }
@@ -48,47 +47,48 @@ func (g *groupService) AddUser(ctx context.Context, username string, groupId str
 
 func (g *groupService) Seed(ctx context.Context) error {
 	return g.groupRepo.Create(ctx, types.Group{
-		Id:   "root",
 		Name: "root",
 	})
 }
 
 func (g *groupService) CreateGroup(ctx context.Context, dto types.GroupCreateDto) error {
-	return g.groupRepo.Create(ctx, types.Group{ // check if name is taken
-		Id:   uuid.NewString(),
+	if err := dto.Validate(); err != nil {
+		return err
+	}
+	return g.groupRepo.Create(ctx, types.Group{
 		Name: dto.Name,
 	})
 }
 
-func (g *groupService) DeleteGroup(ctx context.Context, id string) error {
-	if id != "root" {
+func (g *groupService) DeleteGroup(ctx context.Context, name string) error {
+	if name != "root" {
 		return errors.New("can't delete root group")
 	}
-	return g.groupRepo.Delete(ctx, id) // check if id is not root because we can't delete root group
+	return g.groupRepo.Delete(ctx, name)
 }
 
 func (g *groupService) GetAll(ctx context.Context) []types.Group {
 	groups, err := g.groupRepo.GetAll(ctx)
-	if !errors.Is(err, &types.ErrNotFound{}) { // maybe won't work if error is nil
-		g.logger.Error(err.Error())
+	if e, ok := err.(types.ErrNotFound); !ok {
+		g.logger.Error(e.Error())
 	}
 	return groups
 }
 
-func (g *groupService) GetById(ctx context.Context, id string) (*types.Group, error) {
-	return g.groupRepo.GetById(ctx, id)
+func (g *groupService) GetByName(ctx context.Context, name string) (*types.Group, error) {
+	return g.groupRepo.GetByName(ctx, name)
 }
 
-func (g *groupService) RemoveUser(ctx context.Context, username string, groupId string) error {
-	if username == "root" && groupId == "root" {
+func (g *groupService) RemoveUser(ctx context.Context, username string, group string) error {
+	if username == "root" && group == "root" {
 		return errors.New("can't remove root user from root group")
 	}
-	return g.groupRepo.RemoveUser(ctx, username, groupId)
+	return g.groupRepo.RemoveUser(ctx, username, group)
 }
 
-func (g *groupService) UpdateGroup(ctx context.Context, id string, group types.GroupUpdateDto) error {
-	if id == "root" {
+func (g *groupService) UpdateGroup(ctx context.Context, name string, group types.GroupUpdateDto) error {
+	if name == "root" {
 		return errors.New("can't change name of a root group")
 	}
-	return g.groupRepo.Update(ctx, id, types.Group{Id: id, Name: group.Name})
+	return g.groupRepo.Update(ctx, name, types.Group{Name: group.Name})
 }

@@ -9,10 +9,10 @@ import (
 
 type GroupRepo interface {
 	GetAll(ctx context.Context) ([]types.Group, error)
-	GetById(ctx context.Context, id string) (*types.Group, error)
+	GetByName(ctx context.Context, name string) (*types.Group, error)
 	Create(ctx context.Context, group types.Group) error
-	Delete(ctx context.Context, id string) error
-	Update(ctx context.Context, id string, group types.Group) error
+	Delete(ctx context.Context, name string) error
+	Update(ctx context.Context, name string, group types.Group) error
 	AddUser(ctx context.Context, username, groupId string) error
 	RemoveUser(ctx context.Context, username, groupId string) error
 	GetUserGroups(ctx context.Context, username string) ([]types.Group, error)
@@ -34,9 +34,9 @@ func NewGroupRepo(db *sql.DB) GroupRepo {
 
 func (g *groupRepo) GetUserGroups(ctx context.Context, username string) ([]types.Group, error) {
 	q := `
-		SELECT g.id, g.name FROM groups g 
+		SELECT g.name FROM groups g 
 		INNER JOIN accounts_groups ag 
-		ON ag.group_id=g.id AND ag.account_id=$1;
+		ON ag.group_id=g.name AND ag.account_id=$1;
 	`
 	groups := []types.Group{}
 	row, err := g.db.QueryContext(ctx, q, username)
@@ -48,7 +48,7 @@ func (g *groupRepo) GetUserGroups(ctx context.Context, username string) ([]types
 	}
 	for row.Next() {
 		group := types.Group{}
-		row.Scan(&group.Id, &group.Name)
+		row.Scan(&group.Name)
 		groups = append(groups, group)
 	}
 	return groups, nil
@@ -73,7 +73,7 @@ func (g *groupRepo) RemoveUser(ctx context.Context, username, groupId string) er
 
 func (g *groupRepo) GetAll(ctx context.Context) ([]types.Group, error) {
 	q := `
-		SELECT id, name FROM groups;
+		SELECT name FROM groups;
 	`
 	rows, err := g.db.QueryContext(ctx, q)
 	if err != nil {
@@ -85,19 +85,19 @@ func (g *groupRepo) GetAll(ctx context.Context) ([]types.Group, error) {
 	groups := []types.Group{}
 	for rows.Next() {
 		group := types.Group{}
-		rows.Scan(&group.Id, &group.Name)
+		rows.Scan(&group.Name)
 		groups = append(groups, group)
 	}
 	return groups, nil
 }
 
-func (g *groupRepo) GetById(ctx context.Context, id string) (*types.Group, error) {
+func (g *groupRepo) GetByName(ctx context.Context, name string) (*types.Group, error) {
 	q := `
-		SELECT id, name FROM groups WHERE id=$1;
+		SELECT name FROM groups WHERE name=$1;
 	`
-	row := g.db.QueryRowContext(ctx, q, id)
+	row := g.db.QueryRowContext(ctx, q, name)
 	group := types.Group{}
-	err := row.Scan(&group.Id, &group.Name)
+	err := row.Scan(&group.Name)
 	if err == sql.ErrNoRows {
 		return nil, types.NewErrNotFound("group not found")
 	}
@@ -106,24 +106,24 @@ func (g *groupRepo) GetById(ctx context.Context, id string) (*types.Group, error
 
 func (g *groupRepo) Create(ctx context.Context, group types.Group) error {
 	q := `
-		INSERT INTO groups(id, name) VALUES ($1, $2);
+		INSERT INTO groups(name) VALUES ($1);
 	`
-	_, err := g.db.ExecContext(ctx, q, group.Id, group.Name)
+	_, err := g.db.ExecContext(ctx, q, group.Name)
 	return err
 }
 
-func (g *groupRepo) Delete(ctx context.Context, id string) error {
+func (g *groupRepo) Delete(ctx context.Context, name string) error {
 	q := `
-		DELETE FROM groups WHERE id=$1;
+		DELETE FROM groups WHERE name=$1;
 	`
-	_, err := g.db.ExecContext(ctx, q, id)
+	_, err := g.db.ExecContext(ctx, q, name)
 	return err
 }
 
-func (g *groupRepo) Update(ctx context.Context, id string, group types.Group) error {
+func (g *groupRepo) Update(ctx context.Context, name string, group types.Group) error {
 	q := `
-		UPDATE groups SET name=$1 WHERE id=$2
+		UPDATE groups SET name=$1 WHERE name=$2
 	`
-	_, err := g.db.ExecContext(ctx, q, group.Name, id)
+	_, err := g.db.ExecContext(ctx, q, group.Name, name)
 	return err
 }

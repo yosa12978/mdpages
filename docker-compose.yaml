@@ -23,6 +23,12 @@ services:
       - MDPAGES_REDIS_ADDR=mdpages-redis:6379
     volumes:
       - ./:/app
+    healthcheck:
+      test: curl -f http://localhost:80/health || exit 1
+      interval: 1m
+      timeout: 30s
+      retries: 5
+      start_period: 30s
   redis:
     container_name: mdpages-redis
     image: redis

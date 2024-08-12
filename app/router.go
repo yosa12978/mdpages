@@ -77,6 +77,12 @@ func SetupRoutes(router *http.ServeMux) {
 		util.RenderView(w, r, "home", nil)
 	})
 
+	router.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(200)
+		w.Write([]byte("healthy"))
+	})
+
 	router.HandleFunc("GET /login", middleware.AnonymousOnly(
 		func(w http.ResponseWriter, r *http.Request) {
 			util.RenderView(w, r, "login", nil)

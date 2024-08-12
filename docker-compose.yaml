@@ -41,6 +41,7 @@ services:
     image: postgres
     ports:
       - "5432:5432"
+    restart: always
     environment:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=user
@@ -50,11 +51,7 @@ services:
     networks:
       - mdpages-network
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"
-        ]
+      test: [ "CMD-SHELL", "pg_isready -U user -d mdpages_db" ]
       interval: 10s
       timeout: 5s
       retries: 3

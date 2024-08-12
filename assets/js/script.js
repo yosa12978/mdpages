@@ -4,6 +4,7 @@ function renderMarkdown(id, md) {
 }
 
 function getDate(dateISO8601, timezone = 'GMT') {
-    const d = new Date(dateISO8601);
-    return d.getFullYear().toString() + "/" + (d.getMonth() + 1).toString() + "/" + d.getDate().toString();
+    // const d = new Date(dateISO8601);
+    return moment(dateISO8601).utc().fromNow()
+    // return d.getFullYear().toString() + "/" + (d.getMonth() + 1).toString() + "/" + d.getDate().toString();
 }

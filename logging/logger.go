@@ -14,6 +14,6 @@ type Logger interface {
 
 func NewLogger(w io.Writer) Logger {
 	return &slogLogger{
-		logger: slog.New(slog.NewTextHandler(w, nil)),
+		logger: slog.New(slog.NewJSONHandler(w, nil)),
 	}
 }

@@ -49,8 +49,10 @@ type Group struct {
 }
 
 type Session struct {
-	Username string  `json:"username"`
-	Groups   []Group `json:"groups"`
+	Username        string  `json:"username"`
+	Groups          []Group `json:"groups"`
+	IsAuthenticated bool    `json:"is_authenticated"`
+	Timestamp       int64   `json:"timestamp"`
 }
 
 type Templ struct {

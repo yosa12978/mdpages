@@ -9,20 +9,13 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/joho/godotenv"
+	"github.com/yosa12978/mdpages/config"
 	"github.com/yosa12978/mdpages/logging"
 	"github.com/yosa12978/mdpages/session"
 )
 
-func init() {
-	if os.Getenv("DEBUG") == "true" {
-		if err := godotenv.Load(); err != nil {
-			panic(err)
-		}
-	}
-}
-
 func Run() error {
+	cfg := config.Get()
 	logger := logging.NewLogger(os.Stdin)
 
 	ctx, cancel := signal.NotifyContext(
@@ -33,15 +26,15 @@ func Run() error {
 	defer cancel()
 
 	session.SetupStore()
-
+	addr := fmt.Sprintf("%s:%d", cfg.App.Host, cfg.App.Port)
 	server := http.Server{
-		Addr:    os.Getenv("ADDR"),
+		Addr:    addr,
 		Handler: NewRouter(ctx),
 	}
 
 	errCh := make(chan error, 1)
 	go func() {
-		logger.Info(fmt.Sprintf("server listening on %v", server.Addr))
+		logger.Info(fmt.Sprintf("server listening on %v", addr))
 		if err := server.ListenAndServe(); err != nil {
 			errCh <- err
 		}

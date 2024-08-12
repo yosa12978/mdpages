@@ -1,11 +1,10 @@
 package data
 
 import (
-	"os"
-	"strconv"
 	"sync"
 
 	"github.com/go-redis/redis"
+	"github.com/yosa12978/mdpages/config"
 )
 
 var (
@@ -15,14 +14,11 @@ var (
 
 func Redis() *redis.Client {
 	redisOnce.Do(func() {
-		db, err := strconv.Atoi(os.Getenv("REDIS_DB"))
-		if err != nil {
-			panic(err)
-		}
+		cfg := config.Get()
 		rdb = redis.NewClient(&redis.Options{
-			Addr:     os.Getenv("REDIS_ADDR"),
-			Password: os.Getenv("REDIS_PASSWORD"),
-			DB:       db,
+			Addr:     cfg.Redis.Addr,
+			Password: cfg.Redis.Password,
+			DB:       cfg.Redis.Db,
 		})
 		if err := rdb.Ping().Err(); err != nil {
 			panic(err)

@@ -2,10 +2,11 @@ package data
 
 import (
 	"database/sql"
-	"os"
+	"fmt"
 	"sync"
 
 	_ "github.com/lib/pq"
+	"github.com/yosa12978/mdpages/config"
 )
 
 var (
@@ -15,7 +16,14 @@ var (
 
 func Postgres() *sql.DB {
 	pgOnce.Do(func() {
-		conn, err := sql.Open("postgres", os.Getenv("POSTGRES"))
+		cfg := config.Get()
+		addr := fmt.Sprintf(
+			"postgres://%s:%s@%s",
+			cfg.Postgres.Username,
+			cfg.Postgres.Password,
+			cfg.Postgres.Addr,
+		)
+		conn, err := sql.Open("postgres", addr)
 		if err != nil {
 			panic(err)
 		}

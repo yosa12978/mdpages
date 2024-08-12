@@ -6,9 +6,10 @@ require (
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/sessions v1.3.0
-	github.com/joho/godotenv v1.5.1
+	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/lib/pq v1.10.9
 	golang.org/x/crypto v0.24.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (

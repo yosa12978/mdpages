@@ -1,0 +1,17 @@
+app:
+  host: "0.0.0.0"
+  port: 80
+  root_password: "root"
+  session_key: "3907a226-0a80-401e-9a2a-7d2ebef4ab96"
+  type: "public"
+  enable_registration: true
+
+postgres:
+  username: "user"
+  password: "user"
+  addr: "localhost:5432/mdpages_db?sslmode=disable"
+
+redis:
+  addr: "localhost:6379"
+  db: 0
+  password: ""

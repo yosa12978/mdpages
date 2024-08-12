@@ -4,9 +4,10 @@ import (
 	"encoding/gob"
 	"errors"
 	"net/http"
-	"os"
+	"time"
 
 	"github.com/gorilla/sessions"
+	"github.com/yosa12978/mdpages/config"
 	"github.com/yosa12978/mdpages/types"
 )
 
@@ -20,7 +21,8 @@ func init() {
 }
 
 func SetupStore() {
-	store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
+	cfg := config.Get()
+	store = sessions.NewCookieStore([]byte(cfg.App.SessionKey))
 }
 
 func Get(r *http.Request, key string) (interface{}, error) {
@@ -49,17 +51,6 @@ func Delete(r *http.Request, w http.ResponseWriter, key string) error {
 	return session.Save(r, w)
 }
 
-func EndSession(r *http.Request, w http.ResponseWriter) error {
-	return Delete(r, w, "account")
-}
-
-func StartSession(r *http.Request, w http.ResponseWriter, account types.Account) error {
-	return Set(r, w, "account", types.Session{
-		Username: account.Username,
-		Groups:   account.Groups,
-	})
-}
-
 func GetSession(r *http.Request) (*types.Session, error) {
 	session, err := store.Get(r, "mdpages_session")
 	if err != nil {
@@ -69,4 +60,26 @@ func GetSession(r *http.Request) (*types.Session, error) {
 		return &value, nil
 	}
 	return nil, errors.New("user is not logged in")
+}
+
+func EndSession(r *http.Request, w http.ResponseWriter) error {
+	session, err := store.Get(r, "mdpages_session")
+	if err != nil {
+		return err
+	}
+	session.Options.MaxAge = -1
+	return session.Save(r, w)
+}
+
+func StartSession(r *http.Request, w http.ResponseWriter, account types.Account) error {
+	session, err := store.New(r, "mdpages_session")
+	if err != nil {
+		return err
+	}
+	session.Values["account"] = types.Session{
+		Username:        account.Username,
+		IsAuthenticated: true,
+		Timestamp:       time.Now().UTC().UnixNano(),
+	}
+	return session.Save(r, w)
 }

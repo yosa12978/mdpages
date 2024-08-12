@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/yosa12978/mdpages/config"
 	"github.com/yosa12978/mdpages/data"
 	"github.com/yosa12978/mdpages/handler"
 	"github.com/yosa12978/mdpages/logging"
@@ -17,6 +18,7 @@ import (
 
 func NewRouter(ctx context.Context) http.Handler {
 	router := http.NewServeMux()
+	cfg := config.Get()
 
 	accountRepo := repos.NewAccountRepo(data.Postgres())
 	articleRepo := repos.NewArticleRepo(data.Postgres())
@@ -36,7 +38,7 @@ func NewRouter(ctx context.Context) http.Handler {
 	if err := groupService.Seed(ctx); err != nil {
 		logger.Error(err.Error())
 	}
-	if err := accountService.Seed(ctx, os.Getenv("ROOT_PASSWORD")); err != nil {
+	if err := accountService.Seed(ctx, cfg.App.RootPassword); err != nil {
 		logger.Error(err.Error())
 	}
 	if err := categoryService.Seed(ctx); err != nil {

@@ -1,0 +1,96 @@
+services:
+  web:
+    container_name: mdpages-api
+    build:
+      context: .
+      dockerfile: air.dockerfile
+    ports:
+      - "3000:80"
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - mdpages-network
+    environment:
+      - MDPAGES_POSTGRES_USERNAME=user
+      - MDPAGES_POSTGRES_PASSWORD=user
+      - MDPAGES_POSTGRES_ADDR=mdpages-postgres:5432/mdpages_db?sslmode=disable
+      - MDPAGES_REDIS_ADDR=mdpages-redis:6379
+    volumes:
+      - ./:/app
+  redis:
+    container_name: mdpages-redis
+    image: redis
+    restart: always
+    networks:
+      - mdpages-network
+    volumes:
+      - cache-data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  postgres:
+    container_name: mdpages-postgres
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=user
+      - POSTGRES_DB=mdpages_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - mdpages-network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  adminer:
+    container_name: mdpages-adminer
+    image: adminer
+    restart: always
+    ports:
+      - 3001:8080
+    networks:
+      - mdpages-network
+  migrate:
+    container_name: mdpages-migrate
+    image: migrate/migrate
+    networks:
+      - mdpages-network
+    volumes:
+      - ./migrations:/migrations
+    command:
+      [
+        "-path",
+        "/migrations",
+        "-database",
+        "postgres://user:user@mdpages-postgres:5432/mdpages_db?sslmode=disable",
+        "up"
+      ]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    links:
+      - postgres
+
+networks:
+  mdpages-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  cache-data:

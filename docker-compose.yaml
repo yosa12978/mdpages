@@ -1,6 +1,6 @@
 services:
   web:
-    container_name: mdpages-api
+    container_name: mdpages-web
     build:
       context: .
       dockerfile: air.dockerfile
